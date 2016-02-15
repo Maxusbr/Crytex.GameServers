@@ -9,7 +9,7 @@ namespace Crytex.GameServers.Interface
     public interface ISshCommand
     {
         void Go(string userId, string id);
-        void On(string userId, string id);
+        void On(string userId, string id, int slots);
         void Off(string userId, string id);
     }
 }

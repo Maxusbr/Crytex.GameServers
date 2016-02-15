@@ -9,31 +9,15 @@ using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
-    public class CS : ISshCommand
+    public class Cs : BaseGame, ISshCommand
     {
-        public void Go(string userId, string id)
+        public override void Go(string userId, string id)
         {
-            var ip = "ip";
-            var port = 61586;
-            using (var client = new SshClient(ip, port, "username", "password"))
-            {
-                client.Connect();
-                /*
-                $ssh->exec_cmd('cd /host/;mkdir '.$user.';');
-	            $ssh->exec_cmd('cd /;groupadd -g '.$id.' s'.$id.';useradd -u '.$id.' -d /host/'.$user.'/'.$id.' -g s'.$id.' s'.$id.';');
-	            $ssh->exec_cmd('cd /host/'.$user.'/;rm -R '.$id.';');
-	            $ssh->exec_cmd('cd /host/;screen -dmS install_'.$id.' cp -rv '.decod($rate['p14']).' '.$user.'/'.$id.';');
-                */
-
-                client.RunCommand($"cd /host/;mkdir {userId};");
-                client.RunCommand($"cd /;groupadd -g {id} s{id};useradd -u {id} -d /host/{userId}/{id} -g s{id} s{id};");
-                client.RunCommand($"cd /host/{userId}/;rm -R {id};");
-                client.RunCommand($"cd /host/;screen -dmS install_{id} cp -rv sc {userId}/{id};");
-                client.Disconnect();
-            }
+            //TODO Add info to database
+            base.Go(userId, id);
         }
 
-        public void On(string userId, string id)
+        public void On(string userId, string id, int slots)
         {
             var ip = "ip";
             var port = 61586;
@@ -41,17 +25,16 @@ namespace Crytex.GameServers.Games
             {
                 client.Connect();
                 var map = "de_dust2";
-                var slots = 20;
-                int cpu_mc = 1;
+                int cpu_cs = 1;
                 var sv_password = "SV Password";
                 var drop = $" +sv_password '{sv_password}'";
-                var rcon = "generate_password('10')";
-                drop += $" +rcon_password '{rcon}'";
+                drop += $" +rcon_password '{GeneratePassword(10)}'";
                 /*
                 if($row['p9'] != ""){$dop = " +sv_password '".$pass2."'";}
 	            if($row['p14'] != ""){$dop .= " +rcon_password '".$rcon."'";}
 	            if($row['p15'] != ""){$dop .= " ";}
-	            $run = 'cd /host/'.$user.'/'.$id.'/;chmod 777 hlds_run;screen -dmS server_'.$id.' sudo -u s'.$id.' ./hlds_run -game cstrike  +servercfgfile server.cfg +log off  +map \''.$map.'\' +maxplayers '.$slots.' +ip '.$ip2.' -port '.$port2.' +fps_max 1000  '.$dop.' +sv_lan 0  -pingboost 3;';
+	            $run = 'cd /host/'.$user.'/'.$id.'/;chmod 777 hlds_run;screen -dmS server_'.$id.' sudo -u s'.$id.' 
+                ./hlds_run -game cstrike  +servercfgfile server.cfg +log off  +map \''.$map.'\' +maxplayers '.$slots.' +ip '.$ip2.' -port '.$port2.' +fps_max 1000  '.$dop.' +sv_lan 0  -pingboost 3;';
 	            $ssh->exec_cmd($run);
 	            sleep('2');
 	            $ssh->exec_cmd("ps -ef | grep hlds_i686 | grep -v grep | grep -v sh | grep ".$ip2." | grep ".$port2." | awk '{ print $2}';");
@@ -65,11 +48,11 @@ namespace Crytex.GameServers.Games
                           $"./hlds_run -game cstrike  +servercfgfile server.cfg +log off  +map '{map}' +maxplayers {slots} " +
                           $"+ip {ip} -port {port} +fps_max 1000  {drop} +sv_lan 0  -pingboost 3;";
                 client.RunCommand(run);
-                Thread.Sleep(2);
+                Thread.Sleep(2000);
                 run = $"ps -ef | grep hlds_i686 | grep -v grep | grep -v sh | grep {ip} | grep {port} | awk"+" '{ print $2}';";
                 var result = client.RunCommand(run);
                 var data = result.Result.Replace('\n', ' ');
-                var cpu = slots * cpu_mc;
+                var cpu = slots * cpu_cs;
                 client.RunCommand($"screen -dmS server_cpu_{id} cpulimit -v -z -p {data} -l {cpu};");
                 client.Disconnect();
             }
