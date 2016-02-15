@@ -9,7 +9,7 @@ using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
-    public class Minecraft : BaseGame, ISshCommand
+    public class Minecraft : BaseGameServer
     {
         public override void Go(string userId, string id)
         {
@@ -17,16 +17,18 @@ namespace Crytex.GameServers.Games
             base.Go(userId, id);
         }
 
-        public void On(string userId, string id, int slots)
+        public override void On(string id, int slots)
         {
-            var ip = "ip";
-            var port = 61586;
+            var server = FindById(id);
+            var userId = server.UserId;
+            var ip = server.Ip;
+            var port = server.Port;
             var mem = slots * 70;
-            using (var client = new SshClient(ip, port, "username", "password"))
+            using (var client = new SshClient(ip, SshPort, "username", "password"))
             {
                 client.Connect();
-                int cpu_mc = 1;
-                
+                int cpu_mc = server.MinCpu;
+
                 /*
                 http://mmo-db.com/minecraft/info/sozdanie_i_nastroyka_servera
     $mem = $slots*70;
@@ -112,7 +114,7 @@ namespace Crytex.GameServers.Games
             }
         }
 
-        public void Off(string userId, string id)
+        public override void Off(string id)
         {
             /*
     $ssh->exec_cmd("ps -ef | grep SCREEN | grep -v grep | grep server_".$id." | awk '{ print $2}'");
@@ -129,9 +131,9 @@ namespace Crytex.GameServers.Games
 	$data3 = str_replace("\n","",$data3);
 	$ssh->exec_cmd("kill -9 ".$data2.";kill -9 ".$data.";kill -9 ".$data3.";screen -wipe");
             */
-            var ip = "ip";
-            var port = 61586;
-            using (var client = new SshClient(ip, port, "username", "password"))
+            var server = FindById(id);
+            var ip = server.Ip;
+            using (var client = new SshClient(ip, SshPort, "username", "password"))
             {
                 client.Connect();
                 var run = $"ps -ef | grep SCREEN | grep -v grep | grep server_{id} | awk" + " '{ print $2}'";

@@ -9,7 +9,7 @@ using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
-    public class TF2 : BaseGame, ISshCommand
+    public class TF2 : BaseGameServer
     {
         public override void Go(string userId, string id)
         {
@@ -17,16 +17,17 @@ namespace Crytex.GameServers.Games
             base.Go(userId, id);
         }
 
-        public void On(string userId, string id, int slots)
+        public override void On(string id, int slots)
         {
-            var ip = "ip";
-            var port = 61586;
-            using (var client = new SshClient(ip, port, "username", "password"))
+            var server = FindById(id);
+            var userId = server.UserId;
+            var ip = server.Ip;
+            var port = server.Port;
+            using (var client = new SshClient(ip, SshPort, "username", "password"))
             {
                 client.Connect();
                 var map = "arena_badlands.bsp";
-                int cpu_css = 1;
-                var sv_password = "Server Password";
+                var sv_password = server.Password;
                 var drop = $" -nohltv +sv_password '{sv_password}'";
                 drop += $" +rcon_password '{GeneratePassword(10)}'";
                 drop += " -tickrate '66'";
@@ -65,7 +66,7 @@ namespace Crytex.GameServers.Games
             }
         }
 
-        public void Off(string userId, string id)
+        public override void Off(string id)
         {
             /*
     $ssh->exec_cmd("ps -ef | grep SCREEN | grep -v grep | grep server_".$id." | grep ".$ip2." | grep ".$port2." | awk '{ print $2}'");
@@ -81,9 +82,10 @@ namespace Crytex.GameServers.Games
 	$data3 = str_replace("\n","",$data3);
 	$ssh->exec_cmd("kill ".$data2.";kill ".$data.";kill ".$data3.";screen -wipe");
             */
-            var ip = "ip";
-            var port = 61586;
-            using (var client = new SshClient(ip, port, "username", "password"))
+            var server = FindById(id);
+            var ip = server.Ip;
+            var port = server.Port;
+            using (var client = new SshClient(ip, SshPort, "username", "password"))
             {
                 client.Connect();
                 var run = $"ps -ef | grep SCREEN | grep -v grep | grep server_{id} | grep {ip} | grep {port} | awk" + " '{ print $2}'";
