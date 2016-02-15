@@ -25,7 +25,6 @@ namespace Crytex.GameServers.Games
             using (var client = new SshClient(ip, port, "username", "password"))
             {
                 client.Connect();
-                var map = "l4d_farm01_hilltop";
                 int cpu_mc = 1;
                 
                 /*

@@ -72,6 +72,8 @@
   <ItemGroup>
     <Compile Include="Games\BaseGame.cs" />
     <Compile Include="Games\CS.cs" />
+    <Compile Include="Games\TF2.cs" />
+    <Compile Include="Games\SAMP.cs" />
     <Compile Include="Games\Minecraft.cs" />
     <Compile Include="Games\L4D.cs" />
     <Compile Include="Games\Gmod.cs" />
