@@ -10,15 +10,14 @@ using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
-    public class Css : BaseGameServer
+    public class Css : BaseGameHost
     {
         public Css(ConnectParam param) : base(param) { }
 
-        public override void On(ConnectParam param)
+        public override void On(GameHostParam param)
         {
             var id = param.GameId;
             var userId = param.UserId;
-            var ip = param.SshIp;
             var port = param.GamePort;
             var slots = param.Slots;
             int cpu_css = param.MinCpu;
@@ -47,18 +46,17 @@ $cpu = $slots*$conf['cpu_css'];
 $ssh->exec_cmd('screen -dmS server_cpu_'.$id.' cpulimit -v -z -p '.$data.' -l '.$cpu.';');                */
             var run = $"cd /host/{userId}/{id}/css/;chmod 777 srcds_run;screen -dmS server_{id} sudo -u s{id}";
             run += $" ./srcds_run -console -game cstrike +servercfgfile server.cfg -nohltv -autoupdate +map '{map}'";
-            run += $" +maxplayers {slots} +ip {ip} -port {port} {drop};";
+            run += $" +maxplayers {slots} +ip {Ip} -port {port} {drop};";
             Client.RunCommand(run);
             Thread.Sleep(2000);
-            run = $"ps -ef | grep srcds_linux | grep -v grep | grep -v sh | grep {ip} | grep {port} | awk" + " '{ print $2}';";
+            run = $"ps -ef | grep srcds_linux | grep -v grep | grep -v sh | grep {Ip} | grep {port} | awk" + " '{ print $2}';";
             var result = Client.RunCommand(run);
             var data = result.Result.Replace('\n', ' ');
             var cpu = slots * cpu_css;
             Client.RunCommand($"screen -dmS server_cpu_{id} cpulimit -v -z -p {data} -l {cpu};");
-            Client.Disconnect();
         }
 
-        public override void Off(ConnectParam param)
+        public override void Off(GameHostParam param)
         {
             /*
     $ssh->exec_cmd("ps -ef | grep SCREEN | grep -v grep | grep server_".$id." | grep ".$ip2." | grep ".$port2." | awk '{ print $2}'");
@@ -75,10 +73,9 @@ $ssh->exec_cmd('screen -dmS server_cpu_'.$id.' cpulimit -v -z -p '.$data.' -l '.
 	$ssh->exec_cmd("kill ".$data2.";kill ".$data.";kill ".$data3.";screen -wipe");
             */
             var id = param.GameId;
-            var ip = param.SshIp;
             var port = param.GamePort;
 
-            var run = $"ps -ef | grep SCREEN | grep -v grep | grep server_{id} | grep {ip} | grep {port} | awk" + " '{ print $2}'";
+            var run = $"ps -ef | grep SCREEN | grep -v grep | grep server_{id} | grep {Ip} | grep {port} | awk" + " '{ print $2}'";
             var result = Client.RunCommand(run);
             var data = result.Result.Replace('\n', ' ');
             var scan2 = $"ps -ef | grep srcds_linux | grep -v grep | grep -v sh | grep s{id} | awk '" + "{ print $2}'";

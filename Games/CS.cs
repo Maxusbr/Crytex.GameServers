@@ -10,16 +10,15 @@ using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
-    public class Cs : BaseGameServer
+    public class Cs : BaseGameHost
     {
         public Cs(ConnectParam param) : base(param) { }
 
 
-        public override void On(ConnectParam param)
+        public override void On(GameHostParam param)
         {
             var id = param.GameId;
             var userId = param.UserId;
-            var ip = param.SshIp;
             var port = param.GamePort;
             var slots = param.Slots;
             int cpu_cs = param.MinCpu;
@@ -44,18 +43,17 @@ namespace Crytex.GameServers.Games
             */
             var run = $"cd /host/{userId}/{id}/;chmod 777 hlds_run;screen -dmS server_{id} sudo -u s{id} " +
                       $"./hlds_run -game cstrike  +servercfgfile server.cfg +log off  +map '{map}' +maxplayers {slots} " +
-                      $"+ip {ip} -port {port} +fps_max 1000  {drop} +sv_lan 0  -pingboost 3;";
+                      $"+ip {Ip} -port {port} +fps_max 1000  {drop} +sv_lan 0  -pingboost 3;";
             Client.RunCommand(run);
             Thread.Sleep(2000);
-            run = $"ps -ef | grep hlds_i686 | grep -v grep | grep -v sh | grep {ip} | grep {port} | awk" + " '{ print $2}';";
+            run = $"ps -ef | grep hlds_i686 | grep -v grep | grep -v sh | grep {Ip} | grep {port} | awk" + " '{ print $2}';";
             var result = Client.RunCommand(run);
             var data = result.Result.Replace('\n', ' ');
             var cpu = slots * cpu_cs;
             Client.RunCommand($"screen -dmS server_cpu_{id} cpulimit -v -z -p {data} -l {cpu};");
-            Client.Disconnect();
         }
 
-        public override void Off(ConnectParam param)
+        public override void Off(GameHostParam param)
         {
             /*
             $ssh->exec_cmd("ps -ef | grep SCREEN | grep -v grep | grep server_".$id." | grep ".$ip2." | grep ".$port2." | awk '{ print $2}'");
@@ -73,10 +71,9 @@ namespace Crytex.GameServers.Games
 	        $ssh->disconnect();
             */
             var id = param.GameId;
-            var ip = param.SshIp;
             var port = param.GamePort;
 
-            var run = $"ps -ef | grep SCREEN | grep -v grep | grep server_{id} | grep {ip} | grep {port} | awk" + " '{ print $2}'";
+            var run = $"ps -ef | grep SCREEN | grep -v grep | grep server_{id} | grep {Ip} | grep {port} | awk" + " '{ print $2}'";
             var result = Client.RunCommand(run);
             var data = result.Result.Replace('\n', ' ');
             var scan2 = $"ps -ef | grep hlds_i686 | grep -v grep | grep -v sh | grep s{id} | awk '" + "{ print $2}'";

@@ -20,28 +20,7 @@ namespace Crytex.GameServers.Fabric
         {
             _instance = this;
         }
-
-        public IGameServer CreateGameServer(ConnectParam param)
-        {
-            var server = Get(param);
-            server?.Go(param);
-            // TODO Save bought server to Database
-
-            return server;
-        }
-
-        public void GameServerOn(ConnectParam param)
-        {
-            var server = Get(param);
-            server?.On(param);
-        }
-
-        public void GameServerOff(ConnectParam param)
-        {
-            var server = Get(param);
-            server?.Off(param);
-        }
-        private IGameServer Get(ConnectParam param)
+        public IGameHost Get(ConnectParam param)
         {
             switch (param.FamilyGame)
             {

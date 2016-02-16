@@ -10,15 +10,14 @@ using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
-    public class Minecraft : BaseGameServer
+    public class Minecraft : BaseGameHost
     {
         public Minecraft(ConnectParam param) : base(param) { }
 
-        public override void On(ConnectParam param)
+        public override void On(GameHostParam param)
         {
             var id = param.GameId;
             var userId = param.UserId;
-            var ip = param.SshIp;
             var port = param.GamePort;
             var slots = param.Slots;
             int cpu_mc = param.MinCpu;
@@ -79,7 +78,7 @@ $cpu = $slots*$conf['cpu_mc'];$id2 = cod($id);
             Client.RunCommand(host + "echo \"allow-flight=false\" >> server.properties;");
             Client.RunCommand(host + $"echo \"server-port={port}\" >> server.properties;");
             Client.RunCommand(host + "echo \"level-type=DEFAULT\" >> server.properties;");
-            Client.RunCommand(host + $"echo \"server-ip={ip}\" >> server.properties;");
+            Client.RunCommand(host + $"echo \"server-ip={Ip}\" >> server.properties;");
             Client.RunCommand(host + "echo \"spawn-npcs=true\" >> server.properties;");
             Client.RunCommand(host + "echo \"white-list=false\" >> server.properties;");
             Client.RunCommand(host + "echo \"spawn-animals=true\" >> server.properties;");
@@ -104,11 +103,9 @@ $cpu = $slots*$conf['cpu_mc'];$id2 = cod($id);
             var result = Client.RunCommand(run);
             var data = result.Result.Replace('\n', ' ');
             var cpu = slots * cpu_mc;
-
-            Client.Disconnect();
         }
 
-        public override void Off(ConnectParam param)
+        public override void Off(GameHostParam param)
         {
             /*
     $ssh->exec_cmd("ps -ef | grep SCREEN | grep -v grep | grep server_".$id." | awk '{ print $2}'");

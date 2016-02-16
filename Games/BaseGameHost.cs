@@ -9,17 +9,18 @@ using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
-    public class BaseGameServer : IGameServer
+    public class BaseGameHost : IGameHost
     {
         protected readonly SshClient Client;
-
-        public BaseGameServer(ConnectParam param)
+        protected readonly string Ip;
+        public BaseGameHost(ConnectParam param)
         {
+            Ip = param.SshIp;
             Client = new SshClient(param.SshIp, param.SshPort, param.SshUserName, param.SshPassword);
             Client.Connect();
         }
 
-        public virtual void Go(ConnectParam param)
+        public virtual void Go(GameHostParam param)
         {
             var rcon = GeneratePassword(10);
             var userId = param.UserId;
@@ -37,9 +38,9 @@ namespace Crytex.GameServers.Games
             Client.RunCommand($"cd /host/;screen -dmS install_{id} cp -rv {rcon} {userId}/{id};");
         }
 
-        public virtual void On(ConnectParam param) { }
+        public virtual void On(GameHostParam param) { }
 
-        public virtual void Off(ConnectParam param) { }
+        public virtual void Off(GameHostParam param) { }
 
         protected string GeneratePassword(int count)
         {

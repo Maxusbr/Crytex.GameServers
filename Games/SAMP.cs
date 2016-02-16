@@ -10,15 +10,14 @@ using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
-    public class SAMP : BaseGameServer
+    public class SAMP : BaseGameHost
     {
         public SAMP(ConnectParam param) : base(param) { }
 
-        public override void On(ConnectParam param)
+        public override void On(GameHostParam param)
         {
             var id = param.GameId;
             var userId = param.UserId;
-            var ip = param.SshIp;
             var port = param.GamePort;
             var slots = param.Slots;
             var url = param.Url;
@@ -84,11 +83,9 @@ $ssh->exec_cmd('screen -dmS server_cpu_'.$id.' cpulimit -v -z -p '.$data['2'].' 
             var data = result.Result.Split('\n');
             var cpu = 45;
             Client.RunCommand($"screen -dmS server_cpu_{id} cpulimit -v -z -p {data[2]} -l {cpu};");
-
-            Client.Disconnect();
         }
 
-        public override void Off(ConnectParam param)
+        public override void Off(GameHostParam param)
         {
             /*
     $ssh->exec_cmd("ps -ef | grep SCREEN | grep -v grep | grep server_".$id." | awk '{ print $2}'");
