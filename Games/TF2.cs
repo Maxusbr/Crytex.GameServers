@@ -5,27 +5,24 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Crytex.GameServers.Interface;
+using Crytex.GameServers.Models;
 using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
     public class TF2 : BaseGameServer
     {
-        public override void Go(string userId, string id)
-        {
-            //TODO Add info to database
-            base.Go(userId, id);
-        }
+        public TF2(ConnectParam param) : base(param) { }
 
-        public override void On(string id, int slots)
+        public override void On(ConnectParam param)
         {
-            var server = FindById(id);
-            var userId = server.UserId;
-            var ip = server.Ip;
-            var port = server.Port;
-            Client.Connect();
+            var id = param.GameId;
+            var userId = param.UserId;
+            var ip = param.SshIp;
+            var port = param.GamePort;
+            var slots = param.Slots;
+            var sv_password = param.GamePassword;
             var map = "arena_badlands.bsp";
-            var sv_password = server.Password;
             var drop = $" -nohltv +sv_password '{sv_password}'";
             drop += $" +rcon_password '{GeneratePassword(10)}'";
             drop += " -tickrate '66'";
@@ -63,7 +60,7 @@ $ssh->exec_cmd('taskset -pc '.$core.' '.$data.';');
             Client.Disconnect();
         }
 
-        public override void Off(string id)
+        public override void Off(ConnectParam param)
         {
             /*
     $ssh->exec_cmd("ps -ef | grep SCREEN | grep -v grep | grep server_".$id." | grep ".$ip2." | grep ".$port2." | awk '{ print $2}'");
@@ -79,10 +76,10 @@ $ssh->exec_cmd('taskset -pc '.$core.' '.$data.';');
 	$data3 = str_replace("\n","",$data3);
 	$ssh->exec_cmd("kill ".$data2.";kill ".$data.";kill ".$data3.";screen -wipe");
             */
-            var server = FindById(id);
-            var ip = server.Ip;
-            var port = server.Port;
-            Client.Connect();
+            var id = param.GameId;
+            var ip = param.SshIp;
+            var port = param.GamePort;
+
             var run = $"ps -ef | grep SCREEN | grep -v grep | grep server_{id} | grep {ip} | grep {port} | awk" + " '{ print $2}'";
             var result = Client.RunCommand(run);
             var data = result.Result.Replace('\n', ' ');
@@ -93,8 +90,6 @@ $ssh->exec_cmd('taskset -pc '.$core.' '.$data.';');
             result = Client.RunCommand(scan3);
             var data3 = result.Result.Replace('\n', ' ');
             Client.RunCommand($"kill {data2};kill {data};kill {data3};screen -wipe");
-
-            Client.Disconnect();
         }
     }
 }

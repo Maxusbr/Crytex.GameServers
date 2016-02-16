@@ -11,26 +11,19 @@ namespace Crytex.GameServers.Games
 {
     public class BaseGameServer : IGameServer
     {
-        private SshClient _client;
+        protected readonly SshClient Client;
 
-        protected const int SshPort = 22;
-        public string SshUserName { get; set; }
-        public string SshPassword { get; set; }
-        public string SshIp { get; set; }
-
-        public SshClient Client => _client ?? (_client = new SshClient(SshIp, SshPort, SshUserName, SshPassword));
-
-        public virtual void Go(string userId, string id)
+        public BaseGameServer(ConnectParam param)
         {
-            Guid guid;
-            if (!Guid.TryParse(id, out guid))
-            {
-
-            }
-            var game = FindGameById(guid);
-            var ip = game.Ip;
-            var rcon = GeneratePassword(10);
+            Client = new SshClient(param.SshIp, param.SshPort, param.SshUserName, param.SshPassword);
             Client.Connect();
+        }
+
+        public virtual void Go(ConnectParam param)
+        {
+            var rcon = GeneratePassword(10);
+            var userId = param.UserId;
+            var id = param.GameId;
             /*
             $ssh->exec_cmd('cd /host/;mkdir '.$user.';');
             $ssh->exec_cmd('cd /;groupadd -g '.$id.' s'.$id.';useradd -u '.$id.' -d /host/'.$user.'/'.$id.' -g s'.$id.' s'.$id.';');
@@ -42,31 +35,11 @@ namespace Crytex.GameServers.Games
             Client.RunCommand($"cd /;groupadd -g {id} s{id};useradd -u {id} -d /host/{userId}/{id} -g s{id} s{id};");
             Client.RunCommand($"cd /host/{userId}/;rm -R {id};");
             Client.RunCommand($"cd /host/;screen -dmS install_{id} cp -rv {rcon} {userId}/{id};");
-            Client.Disconnect();
-            // TODO Save GameServer to database in implement
         }
 
-        public virtual void On(string id, int slots) { }
+        public virtual void On(ConnectParam param) { }
 
-        public virtual void Off(string id) { }
-        public GameServerModel FindById(string id)
-        {
-            //TODO return _db.GameServer.FindById(id);
-            var server = new GameServerModel();
-            server.Game = FindGameById(server.GameId);
-            return server;
-        }
-
-
-        private GameModel FindGameById(Guid id)
-        {
-            //TODO return _db.Games.FindById(id);
-            var game = new GameModel();
-            SshIp = game.Ip;
-            SshUserName = game.SshUserName;
-            SshPassword = game.SshPassword;
-            return game;
-        }
+        public virtual void Off(ConnectParam param) { }
 
         protected string GeneratePassword(int count)
         {
@@ -80,6 +53,7 @@ namespace Crytex.GameServers.Games
 
         public void Dispose()
         {
+            Client?.Disconnect();
             Client?.Dispose();
         }
     }

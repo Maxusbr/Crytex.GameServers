@@ -5,28 +5,26 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Crytex.GameServers.Interface;
+using Crytex.GameServers.Models;
 using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
     public class Cs : BaseGameServer
     {
-        public override void Go(string userId, string id)
-        {
-            //TODO Add info to database
-            base.Go(userId, id);
-        }
+        public Cs(ConnectParam param) : base(param) { }
 
-        public override void On(string id, int slots)
+
+        public override void On(ConnectParam param)
         {
-            var server = FindById(id);
-            var userId = server.UserId;
-            var ip = server.Ip;
-            var port = server.Port;
-            Client.Connect();
+            var id = param.GameId;
+            var userId = param.UserId;
+            var ip = param.SshIp;
+            var port = param.GamePort;
+            var slots = param.Slots;
+            int cpu_cs = param.MinCpu;
+            var sv_password = param.GamePassword;
             var map = "de_dust2";
-            int cpu_cs = server.MinCpu;
-            var sv_password = server.Password;
             var drop = $" +sv_password '{sv_password}'";
             drop += $" +rcon_password '{GeneratePassword(10)}'";
             /*
@@ -57,7 +55,7 @@ namespace Crytex.GameServers.Games
             Client.Disconnect();
         }
 
-        public override void Off(string id)
+        public override void Off(ConnectParam param)
         {
             /*
             $ssh->exec_cmd("ps -ef | grep SCREEN | grep -v grep | grep server_".$id." | grep ".$ip2." | grep ".$port2." | awk '{ print $2}'");
@@ -74,10 +72,10 @@ namespace Crytex.GameServers.Games
 	        $ssh->exec_cmd("kill ".$data2.";kill ".$data.";kill ".$data3.";screen -wipe");
 	        $ssh->disconnect();
             */
-            var server = FindById(id);
-            var ip = server.Ip;
-            var port = server.Port;
-            Client.Connect();
+            var id = param.GameId;
+            var ip = param.SshIp;
+            var port = param.GamePort;
+
             var run = $"ps -ef | grep SCREEN | grep -v grep | grep server_{id} | grep {ip} | grep {port} | awk" + " '{ print $2}'";
             var result = Client.RunCommand(run);
             var data = result.Result.Replace('\n', ' ');
@@ -88,8 +86,8 @@ namespace Crytex.GameServers.Games
             result = Client.RunCommand(scan3);
             var data3 = result.Result.Replace('\n', ' ');
             Client.RunCommand($"kill {data2};kill {data};kill {data3};screen -wipe");
-
-            Client.Disconnect();
         }
+
+        
     }
 }

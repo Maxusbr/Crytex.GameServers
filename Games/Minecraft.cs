@@ -5,27 +5,24 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Crytex.GameServers.Interface;
+using Crytex.GameServers.Models;
 using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
     public class Minecraft : BaseGameServer
     {
-        public override void Go(string userId, string id)
-        {
-            //TODO Add info to database
-            base.Go(userId, id);
-        }
+        public Minecraft(ConnectParam param) : base(param) { }
 
-        public override void On(string id, int slots)
+        public override void On(ConnectParam param)
         {
-            var server = FindById(id);
-            var userId = server.UserId;
-            var ip = server.Ip;
-            var port = server.Port;
+            var id = param.GameId;
+            var userId = param.UserId;
+            var ip = param.SshIp;
+            var port = param.GamePort;
+            var slots = param.Slots;
+            int cpu_mc = param.MinCpu;
             var mem = slots * 70;
-            Client.Connect();
-            int cpu_mc = server.MinCpu;
 
             /*
             http://mmo-db.com/minecraft/info/sozdanie_i_nastroyka_servera
@@ -111,7 +108,7 @@ $cpu = $slots*$conf['cpu_mc'];$id2 = cod($id);
             Client.Disconnect();
         }
 
-        public override void Off(string id)
+        public override void Off(ConnectParam param)
         {
             /*
     $ssh->exec_cmd("ps -ef | grep SCREEN | grep -v grep | grep server_".$id." | awk '{ print $2}'");
@@ -128,9 +125,8 @@ $cpu = $slots*$conf['cpu_mc'];$id2 = cod($id);
 	$data3 = str_replace("\n","",$data3);
 	$ssh->exec_cmd("kill -9 ".$data2.";kill -9 ".$data.";kill -9 ".$data3.";screen -wipe");
             */
-            var server = FindById(id);
-            var ip = server.Ip;
-            Client.Connect();
+            var id = param.GameId;
+
             var run = $"ps -ef | grep SCREEN | grep -v grep | grep server_{id} | awk" + " '{ print $2}'";
             var result = Client.RunCommand(run);
             var data = result.Result.Replace('\n', ' ');
@@ -141,8 +137,6 @@ $cpu = $slots*$conf['cpu_mc'];$id2 = cod($id);
             result = Client.RunCommand(scan3);
             var data3 = result.Result.Replace('\n', ' ');
             Client.RunCommand($"kill -9 {data2[1]};kill -9 {data};kill -9 {data3};screen -wipe");
-
-            Client.Disconnect();
         }
     }
 }

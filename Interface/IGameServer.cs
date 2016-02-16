@@ -9,9 +9,8 @@ namespace Crytex.GameServers.Interface
 {
     public interface IGameServer : IDisposable
     {
-        void Go(string userId, string id);
-        void On(string id, int slots);
-        void Off(string id);
-        GameServerModel FindById(string id);
+        void Go(ConnectParam param);
+        void On(ConnectParam param);
+        void Off(ConnectParam param);
     }
 }

@@ -23,11 +23,8 @@ namespace Crytex.GameServers.Fabric
 
         public IGameServer CreateGameServer(ConnectParam param)
         {
-            // TODO var game = _db.Games.FindById(param.GameId);
-            // FamilyGame family = game.Family;
-            var family = FamilyGame.Cs;
-            var server = Get(family);
-            server?.Go(param.UserId, param.GameId);
+            var server = Get(param);
+            server?.Go(param);
             // TODO Save bought server to Database
 
             return server;
@@ -35,49 +32,41 @@ namespace Crytex.GameServers.Fabric
 
         public void GameServerOn(ConnectParam param)
         {
-            // TODO var boughtserver = _db.Servers.FindById(param.ServerId);
-            // var family = boughtserver.Game;
-            var family = FamilyGame.Minecraft;
-            var server = Get(family);
-
-            server?.On(param.ServerId, param.Slots);
+            var server = Get(param);
+            server?.On(param);
         }
 
         public void GameServerOff(ConnectParam param)
         {
-            // TODO var boughtserver = _db.Servers.FindById(param.ServerId);
-            // var family = boughtserver.Game;
-            var family = FamilyGame.Minecraft;
-            var server = Get(family);
-
-            server?.Off(param.ServerId);
+            var server = Get(param);
+            server?.Off(param);
         }
-        private IGameServer Get(FamilyGame family)
+        private IGameServer Get(ConnectParam param)
         {
-            switch (family)
+            switch (param.FamilyGame)
             {
                 case FamilyGame.CssOld:
-                    return new CssOld();
+                    return new CssOld(param);
                 case FamilyGame.Cs:
-                    return new Cs();
+                    return new Cs(param);
                 case FamilyGame.Css:
-                    return new Css();
+                    return new Css(param);
                 case FamilyGame.CsGo:
-                    return new CsGo();
+                    return new CsGo(param);
                 case FamilyGame.Dods:
-                    return new Dods();
+                    return new Dods(param);
                 case FamilyGame.GMod:
-                    return new Gmod();
+                    return new Gmod(param);
                 case FamilyGame.L4D:
-                    return new L4D();
+                    return new L4D(param);
                 case FamilyGame.Minecraft:
-                    return new Minecraft();
+                    return new Minecraft(param);
                 case FamilyGame.SaMp:
-                    return new SAMP();
+                    return new SAMP(param);
                 case FamilyGame.T2F:
-                    return new TF2();
+                    return new TF2(param);
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(family), family, null);
+                    throw new ArgumentOutOfRangeException(nameof(param.FamilyGame), param.FamilyGame, null);
             }
         }
 

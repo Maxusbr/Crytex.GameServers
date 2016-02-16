@@ -5,26 +5,23 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Crytex.GameServers.Interface;
+using Crytex.GameServers.Models;
 using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
     public class SAMP : BaseGameServer
     {
-        public override void Go(string userId, string id)
-        {
-            //TODO Add info to database
-            base.Go(userId, id);
-        }
+        public SAMP(ConnectParam param) : base(param) { }
 
-        public override void On(string id, int slots)
+        public override void On(ConnectParam param)
         {
-            var server = FindById(id);
-            var userId = server.UserId;
-            var ip = server.Ip;
-            var port = server.Port;
-            var url = server.Url;
-            Client.Connect();
+            var id = param.GameId;
+            var userId = param.UserId;
+            var ip = param.SshIp;
+            var port = param.GamePort;
+            var slots = param.Slots;
+            var url = param.Url;
 
             /*
             https://wiki.sa-mp.com/wiki/Server.cfg
@@ -91,7 +88,7 @@ $ssh->exec_cmd('screen -dmS server_cpu_'.$id.' cpulimit -v -z -p '.$data['2'].' 
             Client.Disconnect();
         }
 
-        public override void Off(string id)
+        public override void Off(ConnectParam param)
         {
             /*
     $ssh->exec_cmd("ps -ef | grep SCREEN | grep -v grep | grep server_".$id." | awk '{ print $2}'");
@@ -103,9 +100,8 @@ $ssh->exec_cmd('screen -dmS server_cpu_'.$id.' cpulimit -v -z -p '.$data['2'].' 
 	$data3 = str_replace("\n","",$data3);
 	$ssh->exec_cmd("kill ".$data.";kill ".$data3.";screen -wipe");
             */
-            var server = FindById(id);
-            var ip = server.Ip;
-            Client.Connect();
+            var id = param.GameId;
+
             var run = $"ps -ef | grep SCREEN | grep -v grep | grep server_{id} | awk" + " '{ print $2}'";
             var result = Client.RunCommand(run);
             var data = result.Result.Replace('\n', ' ');
@@ -113,8 +109,6 @@ $ssh->exec_cmd('screen -dmS server_cpu_'.$id.' cpulimit -v -z -p '.$data['2'].' 
             result = Client.RunCommand(scan3);
             var data3 = result.Result.Replace('\n', ' ');
             Client.RunCommand($"kill {data};kill {data3};screen -wipe");
-
-            Client.Disconnect();
         }
     }
 }
