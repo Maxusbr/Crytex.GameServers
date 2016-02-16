@@ -20,5 +20,6 @@ namespace Crytex.GameServers.Models
 
         [ForeignKey("GameId")]
         public virtual GameModel Game { get; set; }
+
     }
 }
