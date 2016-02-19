@@ -2,9 +2,9 @@
 {
     public class GameHostParam
     {
-        public string UserId { get; set; }
+        public int UserId { get; set; }
         public string ServerId { get; set; }
-        public string GameId { get; set; }
+        public int GameId { get; set; }
         public int GamePort { get; set; }
         public string GamePassword { get; set; }
         public int Slots { get; set; }

@@ -13,7 +13,11 @@ namespace Crytex.GameServers.Games
     public class Css : BaseGameHost
     {
         public Css(ConnectParam param) : base(param) { }
-
+        public override void Go(GameHostParam param)
+        {
+            GameName = "cssserver";
+            base.Go(param);
+        }
         public override void On(GameHostParam param)
         {
             var id = param.GameId;
