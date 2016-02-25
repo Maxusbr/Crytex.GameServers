@@ -10,14 +10,14 @@ using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
-    public class Gmod : BaseGameHost
+    public class Ark : BaseGameHost
     {
-        public Gmod(ConnectParam param) : base(param) { GameName = "gmod"; }
+        public Ark(ConnectParam param) : base(param) { GameName = "ark"; }
 
         public override void Go(GameHostParam param)
         {
             var userId = param.UserId;
-            var run = $"cd /host/{GameName}/serverfiles/cstrike/cfg;cp -r cs-server.cfg s{userId}.cfg";
+            var run = $"cd /host/{GameName}/serverfiles//Saved/Config/LinuxServer;cp -r LinuxGame.ini s{userId}.ini";
             var res = Client.RunCommand(run);
             if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
         }

@@ -24,8 +24,10 @@ namespace Crytex.GameServers.Fabric
         {
             switch (param.FamilyGame)
             {
-                case FamilyGame.CssOld:
-                    return new CssOld(param);
+                case FamilyGame.Ark:
+                    return new Ark(param);
+                case FamilyGame.Arma3:
+                    return new Arma3(param);
                 case FamilyGame.Cs:
                     return new Cs(param);
                 case FamilyGame.Css:
@@ -38,6 +40,8 @@ namespace Crytex.GameServers.Fabric
                     return new Gmod(param);
                 case FamilyGame.L4D:
                     return new L4D(param);
+                case FamilyGame.L4D2:
+                    return new L4d2(param);
                 case FamilyGame.Minecraft:
                     return new Minecraft(param);
                 case FamilyGame.SaMp:

@@ -10,9 +10,9 @@ using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
-    public class Gmod : BaseGameHost
+    public class L4d2 : BaseGameHost
     {
-        public Gmod(ConnectParam param) : base(param) { GameName = "gmod"; }
+        public L4d2(ConnectParam param) : base(param) { GameName = "l4d2"; }
 
         public override void Go(GameHostParam param)
         {

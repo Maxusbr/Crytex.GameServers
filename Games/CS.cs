@@ -19,6 +19,7 @@ namespace Crytex.GameServers.Games
             var userId = param.UserId;
             var run = $"cd /host/{GameName}/serverfiles/cstrike/cfg;cp -r cs-server.cfg s{userId}.cfg";
             var res = Client.RunCommand(run);
+            if(!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res);
         }
 
         public override void On(GameHostParam param)
@@ -26,6 +27,7 @@ namespace Crytex.GameServers.Games
             var userId = param.UserId;
             var run = $"cd /host/{GameName};screen -dmS server_start_cs{userId} ./{GameName} start -servicename cs{userId} -port {param.GamePort} -clientport {param.GamePort + 1};";
             var res = Client.RunCommand(run);
+            if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
         }
 
         public override void Off(GameHostParam param)
@@ -33,6 +35,7 @@ namespace Crytex.GameServers.Games
             var userId = param.UserId;
             var run = $"cd /host/{GameName};screen -dmS server_start_cs{userId} ./{GameName} stop -servicename cs{userId} -port {param.GamePort};";
             var res = Client.RunCommand(run);
+            if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
         }
 
         
