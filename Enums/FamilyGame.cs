@@ -13,12 +13,13 @@ namespace Crytex.GameServers.Enums
         Cs,
         Css,
         CsGo,
+        Cure,
         Dods,
         GMod,
         L4D,
         L4D2,
         Minecraft,
         SaMp,
-        T2F
+        T2F, Bmdm, Cscz, Insurgency, JustCause2
     }
 }

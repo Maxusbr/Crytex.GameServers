@@ -10,26 +10,23 @@ using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
-    public class Arma3 : BaseGameHost
+    public class Bmdm : BaseGameHost
     {
-        public Arma3(ConnectParam param) : base(param) { GameName = "arma3"; }
+        public Bmdm(ConnectParam param) : base(param) { GameName = "bmdm"; }
 
         public override void Go(GameHostParam param)
         {
             var userId = param.UserId;
-            var run = $"cd /host/{GameName}/serverfiles/cfg;cp -r arma3-server.server.cfg arm{userId}.server.cfg";
+            var run = $"cd /host/{GameName}/serverfiles/bms/cfg;cp -r bmdm-server.cfg bmdm{userId}.cfg";
             var res = Client.RunCommand(run);
-            Console.WriteLine(!string.IsNullOrEmpty(res.Error) ? res.Error : res.Result);
-            run = $"cd /host/{GameName}/serverfiles/cfg;cp -r arma3-server.network.cfg arm{userId}.network.cfg";
-            res = Client.RunCommand(run);
             Console.WriteLine(!string.IsNullOrEmpty(res.Error) ? res.Error : res.Result);
         }
 
         public override void On(GameHostParam param)
         {
             var userId = param.UserId;
-            var run = $"cd /host/{GameName};screen -dmS server_start_arm{userId} " +
-                      $"./{GameName} start -servicename arm{userId} -port {param.GamePort} -clientport {param.GamePort + 1};";
+            var run = $"cd /host/{GameName};screen -dmS server_start_bmdm{userId} " +
+                      $"./{GameName} start -servicename bmdm{userId} -port {param.GamePort} -clientport {param.GamePort + 1};";
             var res = Client.RunCommand(run);
             Console.WriteLine(!string.IsNullOrEmpty(res.Error) ? res.Error : res.Result);
         }
@@ -37,10 +34,12 @@ namespace Crytex.GameServers.Games
         public override void Off(GameHostParam param)
         {
             var userId = param.UserId;
-            var run = $"cd /host/{GameName};" + //screen -dmS server_stop_arm{userId} " +
-                      $"./{GameName} stop -servicename arm{userId};";
+            var run = $"cd /host/{GameName};screen -dmS server_start_bmdm{userId} " +
+                      $"./{GameName} stop -servicename bmdm{userId} -port {param.GamePort};";
             var res = Client.RunCommand(run);
             Console.WriteLine(!string.IsNullOrEmpty(res.Error) ? res.Error : res.Result);
         }
+
+        
     }
 }

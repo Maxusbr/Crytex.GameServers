@@ -16,28 +16,28 @@ namespace Crytex.GameServers.Games
 
         public override void Go(GameHostParam param)
         {
-            var userId = param.UserId;
-            var run = $"cd /host/{GameName}/serverfiles//Saved/Config/LinuxServer;cp -r LinuxGame.ini s{userId}.ini";
-            var res = Client.RunCommand(run);
-            if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
+            //var userId = param.UserId;
+            //var run = $"cd /host/{GameName}/serverfiles//Saved/Config/LinuxServer;cp -r GameUserSettings.ini s{userId}.ini";
+            //var res = Client.RunCommand(run);
+            //if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
         }
 
         public override void On(GameHostParam param)
         {
             var userId = param.UserId;
-            var run = $"cd /host/{GameName};screen -dmS server_start_cs{userId} " +
-                      $"./{GameName} start -servicename cs{userId} -port {param.GamePort} -clientport {param.GamePort + 1};";
+            var run = $"cd /host/{GameName};screen -dmS server_start_ark{userId} " +
+                      $"./{GameName} start -servicename ark{userId} -port {param.GamePort} -clientport {param.GamePort + 1};";
             var res = Client.RunCommand(run);
-            if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
+            Console.WriteLine(!string.IsNullOrEmpty(res.Error) ? res.Error : res.Result);
         }
 
         public override void Off(GameHostParam param)
         {
             var userId = param.UserId;
-            var run = $"cd /host/{GameName};screen -dmS server_start_cs{userId} " +
-                      $"./{GameName} stop -servicename cs{userId} -port {param.GamePort};";
+            var run = $"cd /host/{GameName};screen -dmS server_stop_ark{userId} " +
+                      $"./{GameName} stop -servicename ark{userId} -port {param.GamePort};";
             var res = Client.RunCommand(run);
-            if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
+            Console.WriteLine(!string.IsNullOrEmpty(res.Error) ? res.Error : res.Result);
         }
     }
 }

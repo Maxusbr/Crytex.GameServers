@@ -10,14 +10,14 @@ using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
-    public class Gmod : BaseGameHost
+    public class Insurgency : BaseGameHost
     {
-        public Gmod(ConnectParam param) : base(param) { GameName = "gmod"; }
+        public Insurgency(ConnectParam param) : base(param) { GameName = "ins"; }
 
         public override void Go(GameHostParam param)
         {
             var userId = param.UserId;
-            var run = $"cd /host/{GameName}/serverfiles/garrysmod/cfg;cp -r gmod-server.cfg gmod{userId}.cfg";
+            var run = $"cd /host/{GameName}/serverfiles/insurgency/cfg;cp -r ins-server.cfg ins{userId}.cfg";
             var res = Client.RunCommand(run);
             if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
         }
@@ -25,8 +25,8 @@ namespace Crytex.GameServers.Games
         public override void On(GameHostParam param)
         {
             var userId = param.UserId;
-            var run = $"cd /host/{GameName};screen -dmS server_start_gmod{userId} " +
-                      $"./{GameName} start -servicename gmod{userId} -port {param.GamePort} -clientport {param.GamePort + 1};";
+            var run = $"cd /host/{GameName};screen -dmS server_start_ins{userId} " +
+                      $"./{GameName} start -servicename ins{userId} -port {param.GamePort} -clientport {param.GamePort + 1};";
             var res = Client.RunCommand(run);
             if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
         }
@@ -34,8 +34,8 @@ namespace Crytex.GameServers.Games
         public override void Off(GameHostParam param)
         {
             var userId = param.UserId;
-            var run = $"cd /host/{GameName};screen -dmS server_start_gmod{userId} " +
-                      $"./{GameName} stop -servicename gmod{userId} -port {param.GamePort};";
+            var run = $"cd /host/{GameName};screen -dmS server_start_ins{userId} " +
+                      $"./{GameName} stop -servicename ins{userId} -port {param.GamePort};";
             var res = Client.RunCommand(run);
             if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
         }

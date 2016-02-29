@@ -34,6 +34,8 @@ namespace Crytex.GameServers.Fabric
                     return new Css(param);
                 case FamilyGame.CsGo:
                     return new CsGo(param);
+                case FamilyGame.Cure:
+                    return new Cure(param);
                 case FamilyGame.Dods:
                     return new Dods(param);
                 case FamilyGame.GMod:
@@ -48,6 +50,14 @@ namespace Crytex.GameServers.Fabric
                     return new SAMP(param);
                 case FamilyGame.T2F:
                     return new TF2(param);
+                case FamilyGame.Bmdm:
+                    return new Bmdm(param);
+                case FamilyGame.Cscz:
+                    return new Cscz(param);
+                case FamilyGame.Insurgency:
+                    return new Insurgency(param);
+                case FamilyGame.JustCause2:
+                    return new JustCause2(param);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(param.FamilyGame), param.FamilyGame, null);
             }
