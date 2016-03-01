@@ -72,8 +72,16 @@
   <ItemGroup>
     <Compile Include="Enums\FamilyGame.cs" />
     <Compile Include="Fabric\GameServerFactory.cs" />
-    <Compile Include="Games\BaseGameServer.cs" />
+    <Compile Include="Games\Ark.cs" />
+    <Compile Include="Games\BMDM.cs" />
+    <Compile Include="Games\Cscz.cs" />
+    <Compile Include="Games\Cure.cs" />
+    <Compile Include="Games\JustCause2.cs" />
+    <Compile Include="Games\L4d2.cs" />
+    <Compile Include="Games\BaseGameHost.cs" />
     <Compile Include="Games\CS.cs" />
+    <Compile Include="Games\Arma3.cs" />
+    <Compile Include="Games\Insurgency.cs" />
     <Compile Include="Games\TF2.cs" />
     <Compile Include="Games\SAMP.cs" />
     <Compile Include="Games\Minecraft.cs" />
@@ -82,9 +90,9 @@
     <Compile Include="Games\Dods.cs" />
     <Compile Include="Games\Css.cs" />
     <Compile Include="Games\CsGo.cs" />
-    <Compile Include="Games\CssOld.cs" />
-    <Compile Include="Interface\IGameServer.cs" />
+    <Compile Include="Interface\IGameHost.cs" />
     <Compile Include="Models\ConnectParam.cs" />
+    <Compile Include="Models\GameHostParam.cs" />
     <Compile Include="Models\GameModel.cs" />
     <Compile Include="Models\GameServerModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

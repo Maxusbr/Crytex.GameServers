@@ -20,58 +20,47 @@ namespace Crytex.GameServers.Fabric
         {
             _instance = this;
         }
-
-        public IGameServer CreateGameServer(FamilyGame family, ConnectParam param)
+        public IGameHost Get(ConnectParam param)
         {
-            // TODO var game = _db.Games.FindById(param.GameId);
-            IGameServer server = null;
-            switch (family)
+            switch (param.FamilyGame)
             {
-                case FamilyGame.CssOld:
-                    server = new CssOld();
-                    break;
+                case FamilyGame.Ark:
+                    return new Ark(param);
+                case FamilyGame.Arma3:
+                    return new Arma3(param);
                 case FamilyGame.Cs:
-                    server = new Cs();
-                    break;
+                    return new Cs(param);
                 case FamilyGame.Css:
-                    server = new Css();
-                    break;
+                    return new Css(param);
                 case FamilyGame.CsGo:
-                    server = new CsGo();
-                    break;
+                    return new CsGo(param);
+                case FamilyGame.Cure:
+                    return new Cure(param);
                 case FamilyGame.Dods:
-                    server = new Dods();
-                    break;
+                    return new Dods(param);
                 case FamilyGame.GMod:
-                    server = new Gmod();
-                    break;
+                    return new Gmod(param);
                 case FamilyGame.L4D:
-                    server = new L4D();
-                    break;
+                    return new L4D(param);
+                case FamilyGame.L4D2:
+                    return new L4d2(param);
                 case FamilyGame.Minecraft:
-                    server = new Minecraft();
-                    break;
+                    return new Minecraft(param);
                 case FamilyGame.SaMp:
-                    server = new SAMP();
-                    break;
+                    return new SAMP(param);
                 case FamilyGame.T2F:
-                    server = new TF2();
-                    break;
+                    return new TF2(param);
+                case FamilyGame.Bmdm:
+                    return new Bmdm(param);
+                case FamilyGame.Cscz:
+                    return new Cscz(param);
+                case FamilyGame.Insurgency:
+                    return new Insurgency(param);
+                case FamilyGame.JustCause2:
+                    return new JustCause2(param);
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(family), family, null);
+                    throw new ArgumentOutOfRangeException(nameof(param.FamilyGame), param.FamilyGame, null);
             }
-            server?.Go(param.UserId, param.GameId);
-            // TODO Save bought server to Database
-
-            return server;
-        }
-
-        public void GameServerOn(ConnectParam param)
-        {
-            // TODO var server = _db.Servers.FindById(param.ServerId);
-            IGameServer server = null;
-
-            server?.On(param.ServerId, param.Slots);
         }
 
     }

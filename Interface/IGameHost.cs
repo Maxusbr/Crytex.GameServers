@@ -7,11 +7,10 @@ using Crytex.GameServers.Models;
 
 namespace Crytex.GameServers.Interface
 {
-    public interface IGameServer : IDisposable
+    public interface IGameHost : IDisposable
     {
-        void Go(string userId, string id);
-        void On(string id, int slots);
-        void Off(string id);
-        GameServerModel FindById(string id);
+        void Go(GameHostParam param);
+        void On(GameHostParam param);
+        void Off(GameHostParam param);
     }
 }
