@@ -12,7 +12,7 @@ namespace Crytex.GameServers.Games
 {
     public class TF2 : BaseGameHost
     {
-        public TF2(ConnectParam param) : base(param) { GameName = "tf2"; }
+        public TF2(ConnectParam param) : base(param) { GameName = param.GameName; }
 
         public override void Go(GameHostParam param)
         {

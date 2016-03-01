@@ -12,7 +12,7 @@ namespace Crytex.GameServers.Games
 {
     public class Cscz : BaseGameHost
     {
-        public Cscz(ConnectParam param) : base(param) { GameName = "cscz"; }
+        public Cscz(ConnectParam param) : base(param) { GameName = param.GameName; }
 
         public override void Go(GameHostParam param)
         {

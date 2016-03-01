@@ -9,5 +9,6 @@ namespace Crytex.GameServers.Models
         public string SshUserName { get; set; }
         public string SshPassword { get; set; }
         public FamilyGame FamilyGame { get; set; }
+        public string GameName { get; set; }
     }
 }
