@@ -12,7 +12,7 @@ namespace Crytex.GameServers.Games
 {
     public class L4d2 : BaseGameHost
     {
-        public L4d2(ConnectParam param) : base(param) { GameName = param.GameName; }
+        public L4d2(ConnectParam param) : base(param) { }
 
         public override void Go(GameHostParam param)
         {

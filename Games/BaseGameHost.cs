@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Crytex.GameServers.Interface;
 using Crytex.GameServers.Models;
@@ -11,12 +13,15 @@ namespace Crytex.GameServers.Games
 {
     public class BaseGameHost : IGameHost
     {
+        public StreamWriter Writer { get; set; }
         protected readonly SshClient Client;
+        protected ShellStream Terminal;
         protected readonly string Ip;
         protected readonly string Password;
         protected string GameName;
         public BaseGameHost(ConnectParam param)
         {
+            GameName = param.GameName;
             Password = param.SshPassword;
             Ip = param.SshIp;
             Client = new SshClient(param.SshIp, param.SshPort, param.SshUserName, param.SshPassword);
@@ -48,6 +53,12 @@ namespace Crytex.GameServers.Games
 
         public virtual void Off(GameHostParam param) { }
 
+        public virtual string Monitor(GameHostParam param) { return ""; }
+        public virtual string OpenConsole(GameHostParam param) { return ""; }
+        public virtual string CloseConsole(GameHostParam param) { return ""; }
+
+        public virtual string SendConsoleCommand(GameHostParam param) { return ""; }
+
         protected string GeneratePassword(int count)
         {
             var rand = new Random();
@@ -58,8 +69,30 @@ namespace Crytex.GameServers.Games
             return res;
         }
 
+        protected string ReadStream(StreamReader reader)
+        {
+            var res = "";
+            var line = reader.ReadLine();
+            while (line != null)
+            {
+                res += line + "\n";
+                line = reader.ReadLine();
+            }
+            return res;
+        }
+
+        protected void WriteStream(string cmd, StreamWriter writer, ShellStream stream)
+        {
+            writer.WriteLine(cmd);
+            while (stream.Length == 0)
+            {
+                Thread.Sleep(500);
+            }
+        }
+
         public void Dispose()
         {
+            Terminal?.Dispose();
             Client?.Disconnect();
             Client?.Dispose();
         }

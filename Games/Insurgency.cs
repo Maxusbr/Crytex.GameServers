@@ -12,7 +12,7 @@ namespace Crytex.GameServers.Games
 {
     public class Insurgency : BaseGameHost
     {
-        public Insurgency(ConnectParam param) : base(param) { GameName = param.GameName; }
+        public Insurgency(ConnectParam param) : base(param) { }
 
         public override void Go(GameHostParam param)
         {

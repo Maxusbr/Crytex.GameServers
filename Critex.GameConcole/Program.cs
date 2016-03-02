@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Crytex.GameServers.Enums;
 using Crytex.GameServers.Fabric;
+using Crytex.GameServers.Interface;
 using Crytex.GameServers.Models;
 
 namespace Critex.GameConcole
@@ -14,17 +15,55 @@ namespace Critex.GameConcole
     {
         private const string LinuxSrvIp = "194.15.147.231";
         private const string Localhost = "192.168.1.131";
+
+        private static ConnectParam _connectparam;
+        private static GameHostParam _gameparam;
+        private static IGameHost _server;
+
         static void Main(string[] args)
         {
+            ReadLine();
+            //Console.Write(" 1 - Ark \n 2 - Arma3\n 3 - CS\n 4 - CSGO\n 5 - CSS\n 6 - Dods\n 7 - Gmod\n 8 - L4D\n 9 - L4D2\n 10 - Minecraft\n" +
+            //              " 11 - TF2\n 12 - Bmdm\n 13 - Cscz\n 14 - Cure\n 15 - Insurgency\n 16 - JustCause2\n Выберите игру: ");
+            //var key = Console.ReadLine();
+            //if(key != null && key.ToLower().Equals("exit")) return;
 
+            //_connectparam = GetLinuxConnect(key);
+            //if (_connectparam == null) return;
+            //using (var server = GameServerFactory.Instance.Get(_connectparam))
+            //{
+            //    var param = new GameHostParam
+            //    {
+            //        GameId = 2000,
+            //        Slots = 2,
+            //        GamePort = 27020,
+            //        ServerId = Guid.NewGuid().ToString(),
+            //        UserId = 1002,
+            //        GamePassword = "",
+            //        MinCpu = 1
+            //    };
+            //    server.Go(param);
+            //    server.On(param);
+            //    Console.WriteLine($"Сервер {_connectparam.FamilyGame} запущен.");
+            //    Console.WriteLine("Для остановки сервера нажмите любую клавишу...");
+            //    Console.ReadKey();
+            //    server.Off(param);
+            //    Console.WriteLine($"Сервер {_connectparam.FamilyGame} остановлен.");
+            //}
+            //Console.Write("Нажмите любую клавишу...");
+            //Console.ReadKey();
+        }
+
+        private static void RunServer()
+        {
             Console.Write(" 1 - Ark \n 2 - Arma3\n 3 - CS\n 4 - CSGO\n 5 - CSS\n 6 - Dods\n 7 - Gmod\n 8 - L4D\n 9 - L4D2\n 10 - Minecraft\n" +
                           " 11 - TF2\n 12 - Bmdm\n 13 - Cscz\n 14 - Cure\n 15 - Insurgency\n 16 - JustCause2\n Выберите игру: ");
             var key = Console.ReadLine();
-            var connectparam = GetLinuxConnect(key);
-            if (connectparam == null) return;
-            using (var server = GameServerFactory.Instance.Get(connectparam))
+            _connectparam = GetLinuxConnect(key);
+            if (_connectparam == null) return;
+            using (var server = GameServerFactory.Instance.Get(_connectparam))
             {
-                var param = new GameHostParam
+                _gameparam = new GameHostParam
                 {
                     GameId = 2000,
                     Slots = 2,
@@ -34,16 +73,96 @@ namespace Critex.GameConcole
                     GamePassword = "",
                     MinCpu = 1
                 };
-                server.Go(param);
-                server.On(param);
-                Console.WriteLine($"Сервер {connectparam.FamilyGame} запущен.");
-                Console.WriteLine("Для остановки сервера нажмите любую клавишу...");
-                Console.ReadKey();
-                server.Off(param);
-                Console.WriteLine($"Сервер {connectparam.FamilyGame} остановлен.");
+                server.Go(_gameparam);
+                server.On(_gameparam);
+                Console.WriteLine($"Сервер {_connectparam.FamilyGame} запущен.");
             }
-            Console.Write("Нажмите любую клавишу...");
-            Console.ReadKey();
+        }
+
+        private static void ReadLine()
+        {
+            while (true)
+            {
+                Console.Write("\n");
+                Console.Write(_connectparam == null ? " 1 - Старт сервер \n" : " 2 - Стоп сервер\n 3 - Состояние\n 4 - Открыть консоль\n 5 - Закрыть консоль\n");
+                Console.Write(" >> ");
+                var key = Console.ReadLine();
+
+                try
+                {
+                    if (key != null)
+                    {
+                        switch (key.ToLower())
+                        {
+                            case "1":
+                                RunServer();
+                                break;
+                            case "2":
+                                StopServer();
+                                break;
+                            case "3":
+                                GetStatus();
+                                break;
+                            case "4":
+                                OpenConsole();
+                                break;
+                            case "5":
+                                CloseConsole();
+                                break;
+                            case "exit":
+                                return;
+                            default:
+                                _server?.Writer?.WriteLine(key);
+                                break;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+        }
+
+        private static void CloseConsole()
+        {
+            if (_connectparam == null || _gameparam == null) return;
+            //using (var server = GameServerFactory.Instance.Get(_connectparam))
+            if (_server == null) return;
+            var res = _server.CloseConsole(_gameparam);
+            Console.WriteLine($"Сервер {_connectparam.FamilyGame}: {res}");
+            _server.Dispose();
+        }
+
+        private static void OpenConsole()
+        {
+            if (_connectparam == null || _gameparam == null) return;
+            _server = GameServerFactory.Instance.Get(_connectparam);
+            {
+                var res = _server.OpenConsole(_gameparam);
+                Console.WriteLine($"Сервер {_connectparam.FamilyGame}: {res}");
+            }
+        }
+
+        private static void GetStatus()
+        {
+            if (_connectparam == null || _gameparam == null) return;
+            using (var server = GameServerFactory.Instance.Get(_connectparam))
+            {
+                var res = server.Monitor(_gameparam);
+                Console.WriteLine($"Сервер {_connectparam.FamilyGame}: {res}");
+            }
+        }
+
+        private static void StopServer()
+        {
+            if (_connectparam == null || _gameparam == null) return;
+            using (var server = GameServerFactory.Instance.Get(_connectparam))
+            {
+                server.Off(_gameparam);
+                Console.WriteLine($"Сервер {_connectparam.FamilyGame} остановлен.");
+            }
+            _connectparam = null;
         }
 
         private static ConnectParam LinuxConnecton(FamilyGame game)

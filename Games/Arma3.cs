@@ -12,7 +12,7 @@ namespace Crytex.GameServers.Games
 {
     public class Arma3 : BaseGameHost
     {
-        public Arma3(ConnectParam param) : base(param) { GameName = param.GameName; }
+        public Arma3(ConnectParam param) : base(param) { }
 
         public override void Go(GameHostParam param)
         {
