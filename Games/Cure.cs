@@ -16,26 +16,27 @@ namespace Crytex.GameServers.Games
 
         public override void Go(GameHostParam param)
         {
-            var userId = param.UserId;
-            var run = $"cd /host/{GameName}/serverfiles/cure/cfg;cp -r cure-server.cfg cure{userId}.cfg";
+            base.Go(param);
+            var run = $"cd /host/{GameName}/serverfiles/cure/cfg;cp -r cure-server.cfg cure{UserId}.cfg";
             var res = Client.RunCommand(run);
             if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
         }
 
-        public override void On(GameHostParam param)
+        public override DataReceivedModel On(GameHostParam param)
         {
-            var userId = param.UserId;
-            var run = $"cd /host/{GameName};screen -dmS server_start_cure{userId} " +
-                      $"./{GameName} start -servicename cure{userId} -port {param.GamePort} -clientport {param.GamePort + 1};";
+            var resModel = base.On(param);
+            var run = $"cd /host/{GameName};screen -dmS server_start_cure{UserId} " +
+                      $"./{GameName} start -servicename cure{UserId} -port {param.GamePort} -clientport {param.GamePort + 1};";
             var res = Client.RunCommand(run);
-            if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
+            resModel.Data = !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
+            return resModel;
         }
 
         public override void Off(GameHostParam param)
         {
-            var userId = param.UserId;
-            var run = $"cd /host/{GameName};screen -dmS server_start_cure{userId} " +
-                      $"./{GameName} stop -servicename cure{userId} -port {param.GamePort};";
+            base.Off(param);
+            var run = $"cd /host/{GameName};screen -dmS server_start_cure{UserId} " +
+                      $"./{GameName} stop -servicename cure{UserId} -port {param.GamePort};";
             var res = Client.RunCommand(run);
             if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
         }

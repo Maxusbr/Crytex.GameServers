@@ -34,6 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.QualityTools.Testing.Fakes, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -49,8 +52,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <Fakes Include="Fakes\Crytex.Model.fakes" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Crytex.Net\Crytex.Model\Crytex.Model.csproj">
+      <Project>{b9447b72-1742-4ad8-8935-b06a3ae26037}</Project>
+      <Name>Crytex.Model</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Crytex.GameServers.csproj">
       <Project>{8d3fdba1-8694-4cd7-abb1-ef7ca3b26298}</Project>
       <Name>Crytex.GameServers</Name>

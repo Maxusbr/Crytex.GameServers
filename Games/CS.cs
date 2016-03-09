@@ -8,101 +8,114 @@ using System.Threading;
 using System.Threading.Tasks;
 using Crytex.GameServers.Interface;
 using Crytex.GameServers.Models;
+using Microsoft.Practices.ObjectBuilder2;
 using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
     public class Cs : BaseGameHost
     {
-        
+
         public Cs(ConnectParam param) : base(param) { }
 
         public override void Go(GameHostParam param)
         {
-            var userId = param.UserId;
-            var run = $"cd /host/{GameName}/serverfiles/cstrike/cfg;cp -r cs-server.cfg s{userId}.cfg";
+            base.Go(param);
+            var run = $"cd /host/{GameName}/serverfiles/cstrike/cfg;cp -r cs-server.cfg s{UserId}.cfg";
             var res = Client.RunCommand(run);
-            Console.WriteLine(!string.IsNullOrEmpty(res.Error) ? res.Error : res.Result);
+            Console.WriteLine(!string.IsNullOrEmpty(res.Error) ? EscapeUtf8(res.Error) : EscapeUtf8(res.Result));
         }
 
-        public override void On(GameHostParam param)
+        public override DataReceivedModel On(GameHostParam param)
         {
-            var userId = param.UserId;
+            var resModel = base.On(param);
             var run = $"cd /host/{GameName};" +//screen -dmS server_start_cs{userId} " +
-                      $"./{GameName} start -servicename cs{userId} -port {param.GamePort} -clientport {param.GamePort + 1};";
+                      $"./{GameName} start -servicename cs{UserId} -port {param.GamePort} -clientport {param.GamePort + 1};";
             var res = Client.RunCommand(run);
-            Console.WriteLine(!string.IsNullOrEmpty(res.Error) ? res.Error : res.Result);
+            //Console.WriteLine(!string.IsNullOrEmpty(res.Error) ? EscapeUtf8(res.Error) : EscapeUtf8(res.Result));
+            if (!string.IsNullOrEmpty(res.Error)) resModel.Data = EscapeUtf8(res.Error);
+            StateServer = Regex.Matches(EscapeUtf8(res.Result),
+                @"\r\[\s*(?<value>\w+)\s*\][^\r]*Starting[^\:\r]+:\s*(?<name>[\w\s]+)[^\r]*\n")
+                .Cast<Match>()
+                .Select(m => new ServerStateModel
+                {
+                    ParameterName = m.Groups["name"].Value,
+                    ParameterValue = m.Groups["value"].Value
+                }).ToList();
+            resModel.ServerStates = StateServer;
+            return resModel;
         }
 
         public override void Off(GameHostParam param)
         {
-            var userId = param.UserId;
+            base.Off(param);
             var run = $"cd /host/{GameName};" +//screen -dmS server_start_cs{userId} " +
-                      $"./{GameName} stop -servicename cs{userId} -port {param.GamePort};";
-            var res = Client.RunCommand(run);
-            Console.WriteLine(!string.IsNullOrEmpty(res.Error) ? res.Error : res.Result);
+                      $"./{GameName} stop -servicename cs{UserId} -port {param.GamePort};";
+            //var res = Client.RunCommand(run);
+            //Console.WriteLine(!string.IsNullOrEmpty(res.Error) ? EscapeUtf8(res.Error) : EscapeUtf8(res.Result));
+            Writer.WriteLine(run);
         }
 
-        public override string Monitor(GameHostParam param)
+        public override DataReceivedModel Monitor(GameHostParam param)
         {
+            var resModel = base.Monitor(param);
             var run = $"cd /host/{GameName};" +//screen -dmS server_start_cs{userId} " +
-                         $"./{GameName} monitor -servicename cs{param.UserId} -port {param.GamePort};";
+                         $"./{GameName} monitor -servicename cs{UserId} -port {param.GamePort};";
             var res = Client.RunCommand(run);
-            return !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
-        }
-
-        public override string OpenConsole(GameHostParam param)
-        {
-            var run = $"cd /host/{GameName};" +//screen -dmS server_start_cs{userId} " +
-                         $"./{GameName} console -servicename cs{param.UserId} -port {param.GamePort};";
-            var res = "";
-            run = $"tmux attach-session -t cs{param.UserId}";
-            //run = $"bind -n C-k send-keys -R ; clear-history";
-            IDictionary<Renci.SshNet.Common.TerminalModes, uint> termkvp = new Dictionary<Renci.SshNet.Common.TerminalModes, uint>();
-            termkvp.Add(Renci.SshNet.Common.TerminalModes.ECHO, 53);
-
-            Terminal = Client.CreateShellStream("xterm", 120, 24, 800, 600, 1024, termkvp);
+            if (!string.IsNullOrEmpty(res.Error))
             {
-                var reader = new StreamReader(Terminal);
-                Writer = new StreamWriter(Terminal) {AutoFlush = true};
-                //var shell = Client.CreateShell(stream, stream, stream);
-                //shell.Start();
-
-                Terminal.DataReceived += Stream_DataReceived;
-                Thread.Sleep(500);
-                //res = reader.ReadToEnd();
-
-                Writer.WriteLine(run);
-                Thread.Sleep(1000);
-
-                //res = reader.ReadToEnd();
-
-                //if (res.Contains("FAIL")) return "fail open console";
-                //Console.WriteLine(res);
-                //WriteStream("status", writer, stream);
-
-                //Thread.Sleep(1000);
-                //res = ReadStream(reader);
+                resModel.Data = EscapeUtf8(res.Error);
+                return resModel;
             }
-            //var res = sr.ReadToEnd();
-            return res;
+            StateServer = Regex.Matches(EscapeUtf8(res.Result),
+                @"\r\[\s*(?<value>\w+)\s*\][^\r]*Monitor[^\:\r]+:\s*(?<name>[\w\s]+)[^\r]*\n")
+                .Cast<Match>()
+                .Select(m => new ServerStateModel
+                {
+                    ParameterName = m.Groups["name"].Value,
+                    ParameterValue = m.Groups["value"].Value
+                }).ToList();
+            resModel.ServerStates = StateServer;
+            resModel.Data = !string.IsNullOrEmpty(res.Error) ? EscapeUtf8(res.Error) : "OK";
+            return resModel;
         }
 
-        private void Stream_DataReceived(object sender, Renci.SshNet.Common.ShellDataEventArgs e)
+        public override void OpenConsole(GameHostParam param)
         {
-            var res = Encoding.UTF8.GetString(e.Data);
-
-            Console.Write(res);
+            base.OpenConsole(param);
+            var run = $"cd /host/{GameName};./{GameName} console -servicename cs{UserId} -port {param.GamePort};";
+            var res = "";
+            //run = $"tmux attach-session -t cs{param.UserId};echo cancelread";
+            Writer.WriteLine(run);
+            //res = Terminal.Expect(new Regex(@"[\[" + $"cs{param.UserId}" + @"\]]"), new TimeSpan(0, 0, 3));
         }
 
-        public override string CloseConsole(GameHostParam param)
+        protected override void OnDataReceived(DataReceivedModel data)
         {
-            var run = $"echo ^b d";
-            var res = Client.RunCommand(run);
-            return !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
+            var rg = new Regex(@"\[" + $"cs{UserId}" + @"\].+");
+            if (rg.IsMatch(data.Data))
+            {
+                StateServer = new List<ServerStateModel>{ new ServerStateModel
+                {
+                    ParameterValue = "Ready",
+                    ParameterName = "Console"
+                }};
+                data.Data = rg.Replace(data.Data, "#>");
+            }
+            //data = EscapeUtf8(data);
+            rg = new Regex(@"\r\[\s*(?<value>\w+)\s*\]\s*Stopping[^:]+:\s*csserver");
+            if (rg.IsMatch(data.Data))
+            {
+                StateServer = rg.Matches(data.Data)
+                .Cast<Match>()
+                .Select(m => new ServerStateModel
+                {
+                    ParameterName = "ServerOFF",
+                    ParameterValue = m.Groups["value"].Value
+                }).ToList();
+            }
+            data.ServerStates = StateServer;
+            base.OnDataReceived(data);
         }
-
-        public override string SendConsoleCommand(GameHostParam param) { return ""; }
     }
 }
-;

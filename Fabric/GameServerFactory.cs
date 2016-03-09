@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Crytex.GameServers.Enums;
 using Crytex.GameServers.Games;
 using Crytex.GameServers.Interface;
 using Crytex.GameServers.Models;
+using Crytex.Model.Enums;
 
 namespace Crytex.GameServers.Fabric
 {
@@ -24,39 +24,39 @@ namespace Crytex.GameServers.Fabric
         {
             switch (param.FamilyGame)
             {
-                case FamilyGame.Ark:
+                case GameFamily.Ark:
                     return new Ark(param);
-                case FamilyGame.Arma3:
+                case GameFamily.Arma3:
                     return new Arma3(param);
-                case FamilyGame.Cs:
+                case GameFamily.Cs:
                     return new Cs(param);
-                case FamilyGame.Css:
+                case GameFamily.Css:
                     return new Css(param);
-                case FamilyGame.CsGo:
+                case GameFamily.CsGo:
                     return new CsGo(param);
-                case FamilyGame.Cure:
+                case GameFamily.Cure:
                     return new Cure(param);
-                case FamilyGame.Dods:
+                case GameFamily.Dods:
                     return new Dods(param);
-                case FamilyGame.GMod:
+                case GameFamily.GMod:
                     return new Gmod(param);
-                case FamilyGame.L4D:
+                case GameFamily.L4D:
                     return new L4D(param);
-                case FamilyGame.L4D2:
+                case GameFamily.L4D2:
                     return new L4d2(param);
-                case FamilyGame.Minecraft:
+                case GameFamily.Minecraft:
                     return new Minecraft(param);
-                case FamilyGame.SaMp:
+                case GameFamily.SaMp:
                     return new SAMP(param);
-                case FamilyGame.T2F:
+                case GameFamily.T2F:
                     return new TF2(param);
-                case FamilyGame.Bmdm:
+                case GameFamily.Bmdm:
                     return new Bmdm(param);
-                case FamilyGame.Cscz:
+                case GameFamily.Cscz:
                     return new Cscz(param);
-                case FamilyGame.Insurgency:
+                case GameFamily.Insurgency:
                     return new Insurgency(param);
-                case FamilyGame.JustCause2:
+                case GameFamily.JustCause2:
                     return new JustCause2(param);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(param.FamilyGame), param.FamilyGame, null);

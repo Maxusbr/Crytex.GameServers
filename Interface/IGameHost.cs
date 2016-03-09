@@ -10,13 +10,13 @@ namespace Crytex.GameServers.Interface
 {
     public interface IGameHost : IDisposable
     {
-        StreamWriter Writer { get;set; }
+        event EventHandler<DataReceivedModel> DataReceived;
         void Go(GameHostParam param);
-        void On(GameHostParam param);
+        DataReceivedModel On(GameHostParam param);
         void Off(GameHostParam param);
-        string Monitor(GameHostParam param);
-        string OpenConsole(GameHostParam param);
+        DataReceivedModel Monitor(GameHostParam param);
+        void OpenConsole(GameHostParam param);
         string CloseConsole(GameHostParam param);
-        string SendConsoleCommand(GameHostParam param);
+        string SendConsoleCommand(string command);
     }
 }
