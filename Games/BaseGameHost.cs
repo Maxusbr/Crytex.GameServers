@@ -14,7 +14,6 @@ namespace Crytex.GameServers.Games
 {
     public class BaseGameHost : IGameHost
     {
-        protected List<ServerStateModel> StateServer { get; set; }
         protected StreamWriter Writer { get; set; }
         protected readonly SshClient Client;
         protected ShellStream Terminal;
@@ -31,9 +30,10 @@ namespace Crytex.GameServers.Games
             Client.Connect();
         }
 
-        public virtual void Go(GameHostParam param)
+        public virtual DataReceivedModel Go(GameHostParam param)
         {
             UserId = param.UserId;
+            return new DataReceivedModel();
         }
 
         public virtual DataReceivedModel On(GameHostParam param)
@@ -65,15 +65,18 @@ namespace Crytex.GameServers.Games
 
         public virtual string CloseConsole(GameHostParam param)
         {
-            var run = $"echo ^b d";
-            var res = Client.RunCommand(run);
+            var run = $"^b d";
+            if (Terminal == null || Writer == StreamWriter.Null) return "";
+            Writer?.WriteLine(run);
             Terminal.DataReceived -= Stream_DataReceived;
-            Writer.Close(); Writer.Dispose();
-            Terminal.Close(); Terminal.Dispose();
-            return !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
+            Writer?.Close(); Writer?.Dispose(); Writer = StreamWriter.Null;
+            Terminal?.Close(); Terminal?.Dispose();
+            Terminal = null;
+            return "";
+            //return !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
         }
 
-        public virtual string SendConsoleCommand(string command)
+        public virtual string SendConsoleCommand(string command, bool waitAll = false)
         {
             Writer?.WriteLine(command);
             return "";
@@ -97,6 +100,11 @@ namespace Crytex.GameServers.Games
             OnDataReceived(res);
         }
 
+        protected virtual void OnDataReceived(DataReceivedModel data)
+        {
+            DataReceived?.Invoke(this, data);
+        }
+
         protected string EscapeUtf8(string data)
         {
             var reg = new Regex(@"\u001b[\[\]\>\(]+(([\dA?;]+[JHcmrdhl])|[mcKBH]|[\d]*)");
@@ -114,9 +122,5 @@ namespace Crytex.GameServers.Games
             //Client?.Dispose();
         }
 
-        protected virtual void OnDataReceived(DataReceivedModel data)
-        {
-            DataReceived?.Invoke(this, data);
-        }
     }
 }

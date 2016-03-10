@@ -110,7 +110,7 @@ namespace Critex.GameConcole
             {
                 Thread.Sleep(1000);
             }
-            _server?.SendConsoleCommand("status");
+            _server?.SendConsoleCommand("status", true);
         }
 
         static bool _isWriteCommand = true;
@@ -159,6 +159,13 @@ namespace Critex.GameConcole
             state = data.ServerStates?.FirstOrDefault(o => o.ParameterName.Equals("Console"));
             if (state != null && state.ParameterValue == "Ready")
                 _isConsoleOpen = true;
+            state = data.ServerStates?.FirstOrDefault(o => o.ParameterName.Equals("Status"));
+            if (state != null && state.ParameterValue == "Ready")
+            {
+                //CloseConsole();
+                _isConsoleOpen = false;
+                WriteCommand();
+            }
         }
 
         private static void GetStatus()

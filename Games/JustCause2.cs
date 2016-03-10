@@ -14,9 +14,9 @@ namespace Crytex.GameServers.Games
     {
         public JustCause2(ConnectParam param) : base(param) { }
 
-        public override void Go(GameHostParam param)
+        public override DataReceivedModel Go(GameHostParam param)
         {
-            base.Go(param);
+            var resModel = base.Go(param);
             var run = $"cd /host/;cp -r jc2 jc2{UserId}";
             var res = Client.RunCommand(run);
             var host = $"cd /host/jc2{UserId}/serverfiles;";
@@ -41,8 +41,8 @@ namespace Crytex.GameServers.Games
             Client.RunCommand(host + "echo \"Module ={MaxErrorCount = 5,ErrorDecrementTime = 500,SendAutorunWhenEmpty = false}\" >> config.lua;");
             Client.RunCommand(host + "echo \"World ={Time = 0.0,TimeStep = 1,WeatherSeverity = 0}\" >> config.lua;");
 
-
-            if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
+            resModel.Data = !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
+            return resModel;
         }
 
         public override DataReceivedModel On(GameHostParam param)

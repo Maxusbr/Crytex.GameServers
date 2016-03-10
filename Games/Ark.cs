@@ -14,9 +14,9 @@ namespace Crytex.GameServers.Games
     {
         public Ark(ConnectParam param) : base(param) {  }
 
-        public override void Go(GameHostParam param)
+        public override DataReceivedModel Go(GameHostParam param)
         {
-            base.Go(param);
+            return base.Go(param);
             //var run = $"cd /host/{GameName}/serverfiles//Saved/Config/LinuxServer;cp -r GameUserSettings.ini s{userId}.ini";
             //var res = Client.RunCommand(run);
             //if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);

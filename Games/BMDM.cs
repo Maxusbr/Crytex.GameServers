@@ -14,12 +14,13 @@ namespace Crytex.GameServers.Games
     {
         public Bmdm(ConnectParam param) : base(param){}
 
-        public override void Go(GameHostParam param)
+        public override DataReceivedModel Go(GameHostParam param)
         {
-            base.Go(param);
+            var resModel = base.Go(param);
             var run = $"cd /host/{GameName}/serverfiles/bms/cfg;cp -r bmdm-server.cfg bmdm{UserId}.cfg";
             var res = Client.RunCommand(run);
-            Console.WriteLine(!string.IsNullOrEmpty(res.Error) ? res.Error : res.Result);
+            resModel.Data = !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
+            return resModel;
         }
 
         public override DataReceivedModel On(GameHostParam param)

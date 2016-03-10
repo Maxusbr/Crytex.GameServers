@@ -96,6 +96,7 @@
     <Compile Include="Models\GameModel.cs" />
     <Compile Include="Models\GameServerModel.cs" />
     <Compile Include="Models\ServerStateModel.cs" />
+    <Compile Include="Models\TableDataModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

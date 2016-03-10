@@ -14,12 +14,13 @@ namespace Crytex.GameServers.Games
     {
         public L4d2(ConnectParam param) : base(param) { }
 
-        public override void Go(GameHostParam param)
+        public override DataReceivedModel Go(GameHostParam param)
         {
-            base.Go(param);
+            var resModel = base.Go(param);
             var run = $"cd /host/{GameName}/serverfiles/left4dead2/cfg;cp -r server.cfg l4d2{UserId}.cfg";
             var res = Client.RunCommand(run);
-            if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
+            resModel.Data = !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
+            return resModel;
         }
 
         public override DataReceivedModel On(GameHostParam param)

@@ -14,13 +14,14 @@ namespace Crytex.GameServers.Games
     {
         public Insurgency(ConnectParam param) : base(param) { }
 
-        public override void Go(GameHostParam param)
+        public override DataReceivedModel Go(GameHostParam param)
         {
-            base.Go(param);
+            var resModel = base.Go(param);
             UserId = param.UserId;
             var run = $"cd /host/{GameName}/serverfiles/insurgency/cfg;cp -r ins-server.cfg ins{UserId}.cfg";
             var res = Client.RunCommand(run);
-            if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
+            resModel.Data = !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
+            return resModel;
         }
 
         public override DataReceivedModel On(GameHostParam param)

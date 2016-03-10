@@ -18,12 +18,13 @@ namespace Crytex.GameServers.Games
 
         public Cs(ConnectParam param) : base(param) { }
 
-        public override void Go(GameHostParam param)
+        public override DataReceivedModel Go(GameHostParam param)
         {
-            base.Go(param);
+            var resModel = base.Go(param);
             var run = $"cd /host/{GameName}/serverfiles/cstrike/cfg;cp -r cs-server.cfg s{UserId}.cfg";
             var res = Client.RunCommand(run);
-            Console.WriteLine(!string.IsNullOrEmpty(res.Error) ? EscapeUtf8(res.Error) : EscapeUtf8(res.Result));
+            resModel.Data = !string.IsNullOrEmpty(res.Error) ? EscapeUtf8(res.Error) : EscapeUtf8(res.Result);
+            return resModel;
         }
 
         public override DataReceivedModel On(GameHostParam param)
@@ -34,7 +35,7 @@ namespace Crytex.GameServers.Games
             var res = Client.RunCommand(run);
             //Console.WriteLine(!string.IsNullOrEmpty(res.Error) ? EscapeUtf8(res.Error) : EscapeUtf8(res.Result));
             if (!string.IsNullOrEmpty(res.Error)) resModel.Data = EscapeUtf8(res.Error);
-            StateServer = Regex.Matches(EscapeUtf8(res.Result),
+            resModel.ServerStates = Regex.Matches(EscapeUtf8(res.Result),
                 @"\r\[\s*(?<value>\w+)\s*\][^\r]*Starting[^\:\r]+:\s*(?<name>[\w\s]+)[^\r]*\n")
                 .Cast<Match>()
                 .Select(m => new ServerStateModel
@@ -42,7 +43,6 @@ namespace Crytex.GameServers.Games
                     ParameterName = m.Groups["name"].Value,
                     ParameterValue = m.Groups["value"].Value
                 }).ToList();
-            resModel.ServerStates = StateServer;
             return resModel;
         }
 
@@ -67,7 +67,7 @@ namespace Crytex.GameServers.Games
                 resModel.Data = EscapeUtf8(res.Error);
                 return resModel;
             }
-            StateServer = Regex.Matches(EscapeUtf8(res.Result),
+            resModel.ServerStates = Regex.Matches(EscapeUtf8(res.Result),
                 @"\r\[\s*(?<value>\w+)\s*\][^\r]*Monitor[^\:\r]+:\s*(?<name>[\w\s]+)[^\r]*\n")
                 .Cast<Match>()
                 .Select(m => new ServerStateModel
@@ -75,7 +75,6 @@ namespace Crytex.GameServers.Games
                     ParameterName = m.Groups["name"].Value,
                     ParameterValue = m.Groups["value"].Value
                 }).ToList();
-            resModel.ServerStates = StateServer;
             resModel.Data = !string.IsNullOrEmpty(res.Error) ? EscapeUtf8(res.Error) : "OK";
             return resModel;
         }
@@ -90,12 +89,27 @@ namespace Crytex.GameServers.Games
             //res = Terminal.Expect(new Regex(@"[\[" + $"cs{param.UserId}" + @"\]]"), new TimeSpan(0, 0, 3));
         }
 
+        public override string SendConsoleCommand(string command, bool waitAll = false)
+        {
+            _isWaitAll = waitAll;
+            if (_isWaitAll)
+            {
+                _collectResiveString = string.Empty;
+                _foundEnd = new Regex(@"[\d]+\s*users");
+            }
+            return base.SendConsoleCommand(command);
+        }
+
+        private bool _isWaitAll;
+        private string _collectResiveString;
+        private Regex _foundEnd;
+
         protected override void OnDataReceived(DataReceivedModel data)
         {
             var rg = new Regex(@"\[" + $"cs{UserId}" + @"\].+");
             if (rg.IsMatch(data.Data))
             {
-                StateServer = new List<ServerStateModel>{ new ServerStateModel
+                data.ServerStates = new List<ServerStateModel>{ new ServerStateModel
                 {
                     ParameterValue = "Ready",
                     ParameterName = "Console"
@@ -106,7 +120,7 @@ namespace Crytex.GameServers.Games
             rg = new Regex(@"\r\[\s*(?<value>\w+)\s*\]\s*Stopping[^:]+:\s*csserver");
             if (rg.IsMatch(data.Data))
             {
-                StateServer = rg.Matches(data.Data)
+                data.ServerStates = rg.Matches(data.Data)
                 .Cast<Match>()
                 .Select(m => new ServerStateModel
                 {
@@ -114,7 +128,25 @@ namespace Crytex.GameServers.Games
                     ParameterValue = m.Groups["value"].Value
                 }).ToList();
             }
-            data.ServerStates = StateServer;
+            if (_isWaitAll)
+            {
+                _collectResiveString += data.Data;
+                if (_foundEnd.IsMatch(_collectResiveString)) CreateTableData();
+            }
+            else
+                base.OnDataReceived(data);
+        }
+
+        private void CreateTableData()
+        {
+            var data = new DataReceivedModel {Data = _collectResiveString, ServerStates = new List<ServerStateModel>{ new ServerStateModel
+                {
+                    ParameterName = "Status",
+                    ParameterValue = "Ready"
+                }}};
+            CloseConsole(null);
+            _collectResiveString = string.Empty;
+            _isWaitAll = false;
             base.OnDataReceived(data);
         }
     }
