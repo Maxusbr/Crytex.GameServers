@@ -139,11 +139,37 @@ namespace Crytex.GameServers.Games
 
         private void CreateTableData()
         {
-            var data = new DataReceivedModel {Data = _collectResiveString, ServerStates = new List<ServerStateModel>{ new ServerStateModel
+            var data = new DataReceivedModel();// {Data = _collectResiveString};
+            var rg = new Regex(@"(?<name>[\w\/]+)\s*:\s*(?<value>[^\n]+)");
+            if (rg.IsMatch(_collectResiveString))
+            {
+                data.ServerStates = rg.Matches(_collectResiveString)
+                .Cast<Match>()
+                .Select(m => new ServerStateModel
                 {
-                    ParameterName = "Status",
-                    ParameterValue = "Ready"
-                }}};
+                    ParameterName = m.Groups["name"].Value,
+                    ParameterValue = m.Groups["value"].Value
+                }).ToList();
+            }
+            if (data.ServerStates == null) data.ServerStates = new List<ServerStateModel>();
+            data.ServerStates.Add(new ServerStateModel
+            {
+                ParameterName = "Status",
+                ParameterValue = "Ready"
+            });
+            rg = new Regex(@"#(?<name>[^\n\r]+)");
+            var listTable = rg.Matches(_collectResiveString)
+                .Cast<Match>()
+                .Select(m => m.Groups["name"].Value).ToList();
+
+            data.TableInfo = new TableDataModel {Values = new List<string>(), Headers = new List<string>{"Number"} };
+            if (listTable.Any())
+                for (var i = 0; i < listTable.Count; i++)
+                {
+                    if (i == 0) data.TableInfo.Headers.AddRange(listTable[i].Split(' ').Where(o => !o.Equals(string.Empty)));
+                    else data.TableInfo.Values.AddRange(listTable[i].Split(' ').Where(o => !o.Equals(string.Empty)));
+                }
+
             CloseConsole(null);
             _collectResiveString = string.Empty;
             _isWaitAll = false;

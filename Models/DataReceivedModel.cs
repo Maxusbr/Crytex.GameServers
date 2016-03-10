@@ -9,7 +9,7 @@ namespace Crytex.GameServers.Models
     public class DataReceivedModel
     {
         public string Data { get; set; }
-        public IEnumerable<ServerStateModel> ServerStates { get; set; }
+        public List<ServerStateModel> ServerStates { get; set; }
         public TableDataModel TableInfo { get; set; }
     }
 }

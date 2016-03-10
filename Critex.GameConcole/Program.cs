@@ -110,6 +110,7 @@ namespace Critex.GameConcole
             {
                 Thread.Sleep(1000);
             }
+            _server?.SendConsoleCommand("clear");
             _server?.SendConsoleCommand("status", true);
         }
 
@@ -164,6 +165,17 @@ namespace Critex.GameConcole
             {
                 //CloseConsole();
                 _isConsoleOpen = false;
+                foreach (var el in data.ServerStates)
+                    Console.WriteLine($"{el.ParameterName} : {el.ParameterValue}");
+                Console.Write("|");
+                foreach (var head in data.TableInfo.Headers)
+                    Console.Write($"{head}\t|");
+                Console.Write('\n');
+                if(data.TableInfo.Values.Any())
+                Console.Write("|");
+                foreach (var value in data.TableInfo.Values)
+                    Console.Write($"{value}\t|");
+                Console.Write('\n');                
                 WriteCommand();
             }
         }
