@@ -12,14 +12,14 @@ namespace Crytex.GameServers.Games
 {
     public class JustCause2 : BaseGameHost
     {
-        public JustCause2(ConnectParam param) : base(param) { GameName = param.GameName; }
+        public JustCause2(ConnectParam param) : base(param) { }
 
-        public override void Go(GameHostParam param)
+        public override DataReceivedModel Go(GameHostParam param)
         {
-            var userId = param.UserId;
-            var run = $"cd /host/;cp -r jc2 jc2{userId}";
+            var resModel = base.Go(param);
+            var run = $"cd /host/;cp -r jc2 jc2{UserId}";
             var res = Client.RunCommand(run);
-            var host = $"cd /host/jc2{userId}/serverfiles;";
+            var host = $"cd /host/jc2{UserId}/serverfiles;";
             Client.RunCommand(host + "chmod 777 config.lua;");
             Client.RunCommand(host + "echo \"Server={\" > config.lua;");
             Client.RunCommand(host + "echo \"MaxPlayers=5000,\" >> config.lua;");
@@ -41,24 +41,25 @@ namespace Crytex.GameServers.Games
             Client.RunCommand(host + "echo \"Module ={MaxErrorCount = 5,ErrorDecrementTime = 500,SendAutorunWhenEmpty = false}\" >> config.lua;");
             Client.RunCommand(host + "echo \"World ={Time = 0.0,TimeStep = 1,WeatherSeverity = 0}\" >> config.lua;");
 
-
-            if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
+            resModel.Data = !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
+            return resModel;
         }
 
-        public override void On(GameHostParam param)
+        public override DataReceivedModel On(GameHostParam param)
         {
-            var userId = param.UserId;
-            var run = $"cd /host/jc2{userId};" + //screen -dmS server_start_jc2{userId} " +
-                      $"./{GameName} start -servicename jc2{userId} -port {param.GamePort} -clientport {param.GamePort + 1};";
+            var resModel = base.On(param);
+            var run = $"cd /host/jc2{UserId};" + //screen -dmS server_start_jc2{userId} " +
+                      $"./{GameName} start -servicename jc2{UserId} -port {param.GamePort} -clientport {param.GamePort + 1};";
             var res = Client.RunCommand(run);
-            Console.WriteLine(!string.IsNullOrEmpty(res.Error) ? res.Error : res.Result);
+            resModel.Data = !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
+            return resModel;
         }
 
         public override void Off(GameHostParam param)
         {
-            var userId = param.UserId;
-            var run = $"cd /host/{GameName};screen -dmS server_start_jc2{userId} " +
-                      $"./{GameName} stop -servicename jc2{userId} -port {param.GamePort};";
+            base.Off(param);
+            var run = $"cd /host/{GameName};screen -dmS server_start_jc2{UserId} " +
+                      $"./{GameName} stop -servicename jc2{UserId} -port {param.GamePort};";
             var res = Client.RunCommand(run);
             if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
         }

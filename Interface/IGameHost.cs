@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,8 +10,13 @@ namespace Crytex.GameServers.Interface
 {
     public interface IGameHost : IDisposable
     {
-        void Go(GameHostParam param);
-        void On(GameHostParam param);
+        event EventHandler<DataReceivedModel> DataReceived;
+        DataReceivedModel Go(GameHostParam param);
+        DataReceivedModel On(GameHostParam param);
         void Off(GameHostParam param);
+        DataReceivedModel Monitor(GameHostParam param);
+        void OpenConsole(GameHostParam param);
+        string CloseConsole(GameHostParam param);
+        string SendConsoleCommand(string command, bool waitAll = false);
     }
 }

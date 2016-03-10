@@ -12,30 +12,32 @@ namespace Crytex.GameServers.Games
 {
     public class L4D : BaseGameHost
     {
-        public L4D(ConnectParam param) : base(param) { GameName = param.GameName; }
+        public L4D(ConnectParam param) : base(param) { }
 
-        public override void Go(GameHostParam param)
+        public override DataReceivedModel Go(GameHostParam param)
         {
-            var userId = param.UserId;
-            var run = $"cd /host/{GameName}/serverfiles/left4dead/cfg;cp -r server.cfg l4d{userId}.cfg";
+            var resModel = base.Go(param);
+            var run = $"cd /host/{GameName}/serverfiles/left4dead/cfg;cp -r server.cfg l4d{UserId}.cfg";
             var res = Client.RunCommand(run);
-            if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
+            resModel.Data = !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
+            return resModel;
         }
 
-        public override void On(GameHostParam param)
+        public override DataReceivedModel On(GameHostParam param)
         {
-            var userId = param.UserId;
-            var run = $"cd /host/{GameName};screen -dmS server_start_l4d{userId} " +
-                      $"./{GameName} start -servicename l4d{userId} -port {param.GamePort} -clientport {param.GamePort + 1};";
+            var resModel = base.On(param);
+            var run = $"cd /host/{GameName};screen -dmS server_start_l4d{UserId} " +
+                      $"./{GameName} start -servicename l4d{UserId} -port {param.GamePort} -clientport {param.GamePort + 1};";
             var res = Client.RunCommand(run);
-            if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
+            resModel.Data = !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
+            return resModel;
         }
 
         public override void Off(GameHostParam param)
         {
-            var userId = param.UserId;
-            var run = $"cd /host/{GameName};screen -dmS server_start_l4d{userId} " +
-                      $"./{GameName} stop -servicename l4d{userId} -port {param.GamePort};";
+            base.Off(param);
+            var run = $"cd /host/{GameName};screen -dmS server_start_l4d{UserId} " +
+                      $"./{GameName} stop -servicename l4d{UserId} -port {param.GamePort};";
             var res = Client.RunCommand(run);
             if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
         }

@@ -14,8 +14,9 @@ namespace Crytex.GameServers.Games
     {
         public Minecraft(ConnectParam param) : base(param) { }
 
-        public override void On(GameHostParam param)
+        public override DataReceivedModel On(GameHostParam param)
         {
+            return base.On(param);
             var id = param.GameId;
             var userId = param.UserId;
             var port = param.GamePort;

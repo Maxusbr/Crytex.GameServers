@@ -12,30 +12,32 @@ namespace Crytex.GameServers.Games
 {
     public class Cscz : BaseGameHost
     {
-        public Cscz(ConnectParam param) : base(param) { GameName = param.GameName; }
+        public Cscz(ConnectParam param) : base(param) { }
 
-        public override void Go(GameHostParam param)
+        public override DataReceivedModel Go(GameHostParam param)
         {
-            var userId = param.UserId;
-            var run = $"cd /host/{GameName}/serverfiles/czero;cp -r cscz-server.cfg cscz{userId}.cfg";
+            var resModel = base.Go(param);
+            var run = $"cd /host/{GameName}/serverfiles/czero;cp -r cscz-server.cfg cscz{UserId}.cfg";
             var res = Client.RunCommand(run);
-            if(!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res);
+            resModel.Data = !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
+            return resModel;
         }
 
-        public override void On(GameHostParam param)
+        public override DataReceivedModel On(GameHostParam param)
         {
-            var userId = param.UserId;
-            var run = $"cd /host/{GameName};screen -dmS server_cscz{userId} " +
-                      $"./{GameName} start -servicename cscz{userId} -port {param.GamePort} -clientport {param.GamePort + 1};";
+            var resModel = base.On(param); ;
+            var run = $"cd /host/{GameName};screen -dmS server_cscz{UserId} " +
+                      $"./{GameName} start -servicename cscz{UserId} -port {param.GamePort} -clientport {param.GamePort + 1};";
             var res = Client.RunCommand(run);
-            if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
+            resModel.Data = !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
+            return resModel;
         }
 
         public override void Off(GameHostParam param)
         {
-            var userId = param.UserId;
-            var run = $"cd /host/{GameName};screen -dmS server_cscz{userId} " +
-                      $"./{GameName} stop -servicename cscz{userId} -port {param.GamePort};";
+            base.Off(param);
+            var run = $"cd /host/{GameName};screen -dmS server_cscz{UserId} " +
+                      $"./{GameName} stop -servicename cscz{UserId} -port {param.GamePort};";
             var res = Client.RunCommand(run);
             if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
         }

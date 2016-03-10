@@ -70,7 +70,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Enums\FamilyGame.cs" />
     <Compile Include="Fabric\GameServerFactory.cs" />
     <Compile Include="Games\Ark.cs" />
     <Compile Include="Games\BMDM.cs" />
@@ -92,15 +91,26 @@
     <Compile Include="Games\CsGo.cs" />
     <Compile Include="Interface\IGameHost.cs" />
     <Compile Include="Models\ConnectParam.cs" />
+    <Compile Include="Models\DataReceivedModel.cs" />
     <Compile Include="Models\GameHostParam.cs" />
     <Compile Include="Models\GameModel.cs" />
     <Compile Include="Models\GameServerModel.cs" />
+    <Compile Include="Models\ServerStateModel.cs" />
+    <Compile Include="Models\TableDataModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Enums\" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Crytex.Net\Crytex.Model\Crytex.Model.csproj">
+      <Project>{b9447b72-1742-4ad8-8935-b06a3ae26037}</Project>
+      <Name>Crytex.Model</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
