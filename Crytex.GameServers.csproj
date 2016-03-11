@@ -70,6 +70,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Example\IGameHost.cs" />
     <Compile Include="Fabric\GameServerFactory.cs" />
     <Compile Include="Games\Ark.cs" />
     <Compile Include="Games\BMDM.cs" />
