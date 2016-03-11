@@ -6,13 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 using Crytex.GameServers.Models;
 using Crytex.Model.Exceptions;
+using Renci.SshNet;
 
 namespace Crytex.GameServers.Example
 {
     internal interface IGameHost 
     {
-        void Connect();
-        void Disconnect();
+        GameResult Connect();
+        GameResult Disconnect();
 
         GameResult Create(CreateParam param);//Go
         GameResult ChangeStatus(ChangeStatusParam param);//On/of
@@ -40,7 +41,7 @@ namespace Crytex.GameServers.Example
 
     internal class GameResult
     {
-        public bool Succes;
+        public bool Succes=true;
         public TypeError? Error { get; set; }
     }
     internal enum TypeError
@@ -71,33 +72,48 @@ namespace Crytex.GameServers.Example
 
     
 
-    internal class GameHostExample : IGameHost
+    internal class BaseGameHost : IGameHost
     {
 
-        GameHostExample(ConnectParam connectParam)
+        protected String GameCode { get; set; }
+        protected ConnectParam ConnectParam { get; set; }
+        protected  readonly SshClient Client { get; set; };
+        public BaseGameHost(ConnectParam connectParam,String GameCode)
         {
-            
+            this.GameCode = GameCode;
+            Client = new SshClient(connectParam.SshIp, connectParam.SshPort, connectParam.SshUserName, connectParam.SshPassword);
         }
 
 
-        public void Connect()
+        public GameResult Connect()
         {
-            throw new NotImplementedException();
+            Client.Connect();
+            return new GameResult();
         }
 
-        public void Disconnect()
+        public GameResult Disconnect()
         {
-            throw new NotImplementedException();
+            Client.Disconnect();
+            return new GameResult();
         }
 
         public GameResult Create(CreateParam param)
         {
-            throw new NotImplementedException();
+            var resModel = base.Go(param);
+            var run = $"cd /host/{GameName}/serverfiles/{GameCode}/cfg;cp -r {GameCode}-server.cfg cure{UserId}.cfg";
+            var res = Client.RunCommand(run);
+            resModel.Data = !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
+            return resModel;
         }
 
         public GameResult ChangeStatus(ChangeStatusParam param)
         {
-            throw new NotImplementedException();
+            var resModel = base.On(param);
+            var run = $"cd /host/{GameName};screen -dmS server_start_{GameCode}{UserId} " +
+                      $"./{GameName} start -servicename {GameCode}{UserId} -port {param.GamePort} -clientport {param.GamePort + 1};";
+            var res = Client.RunCommand(run);
+            resModel.Data = !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
+            return resModel;
         }
 
         public StateGameResult GetState(UserGameParam userGameParam)
@@ -121,5 +137,14 @@ namespace Crytex.GameServers.Example
             throw new NotImplementedException();
         }
     }
+
+    internal class CureGame : BaseGameHost
+    {
+        public CureGame(ConnectParam param) :base(param, "cure")
+        {
+            
+        }
+    }
+
 
 }
