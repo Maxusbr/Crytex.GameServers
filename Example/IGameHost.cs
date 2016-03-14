@@ -5,7 +5,6 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 using Crytex.GameServers.Models;
-using Crytex.Model.Exceptions;
 using Renci.SshNet;
 
 namespace Crytex.GameServers.Example
@@ -75,12 +74,13 @@ namespace Crytex.GameServers.Example
     internal class BaseGameHost : IGameHost
     {
 
-        protected String GameCode { get; set; }
-        protected ConnectParam ConnectParam { get; set; }
-        protected  readonly SshClient Client { get; set; };
-        public BaseGameHost(ConnectParam connectParam,String GameCode)
+        protected readonly string GameCode;
+        protected ConnectParam ConnectParam;
+        protected readonly SshClient Client;
+
+        public BaseGameHost(ConnectParam connectParam, string gameCode)
         {
-            this.GameCode = GameCode;
+            this.GameCode = gameCode;
             Client = new SshClient(connectParam.SshIp, connectParam.SshPort, connectParam.SshUserName, connectParam.SshPassword);
         }
 
@@ -105,6 +105,8 @@ namespace Crytex.GameServers.Example
             resModel.Data = !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
             return resModel;
         }
+
+        
 
         public GameResult ChangeStatus(ChangeStatusParam param)
         {

@@ -70,38 +70,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Example\IGameHost.cs" />
     <Compile Include="Fabric\GameServerFactory.cs" />
-    <Compile Include="Games\Ark.cs" />
-    <Compile Include="Games\BMDM.cs" />
-    <Compile Include="Games\Cscz.cs" />
-    <Compile Include="Games\Cure.cs" />
-    <Compile Include="Games\JustCause2.cs" />
-    <Compile Include="Games\L4d2.cs" />
     <Compile Include="Games\BaseGameHost.cs" />
     <Compile Include="Games\CS.cs" />
-    <Compile Include="Games\Arma3.cs" />
-    <Compile Include="Games\Insurgency.cs" />
-    <Compile Include="Games\TF2.cs" />
-    <Compile Include="Games\SAMP.cs" />
-    <Compile Include="Games\Minecraft.cs" />
-    <Compile Include="Games\L4D.cs" />
-    <Compile Include="Games\Gmod.cs" />
-    <Compile Include="Games\Dods.cs" />
-    <Compile Include="Games\Css.cs" />
-    <Compile Include="Games\CsGo.cs" />
     <Compile Include="Interface\IGameHost.cs" />
+    <Compile Include="Models\ChangeStatusParam.cs" />
     <Compile Include="Models\ConnectParam.cs" />
+    <Compile Include="Models\CreateParam.cs" />
     <Compile Include="Models\DataReceivedModel.cs" />
     <Compile Include="Models\GameHostParam.cs" />
     <Compile Include="Models\GameModel.cs" />
+    <Compile Include="Models\GameResult.cs" />
     <Compile Include="Models\GameServerModel.cs" />
     <Compile Include="Models\ServerStateModel.cs" />
+    <Compile Include="Models\StateGameResult.cs" />
     <Compile Include="Models\TableDataModel.cs" />
+    <Compile Include="Models\UserGameParam.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Enums\" />
+    <Folder Include="Example\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
