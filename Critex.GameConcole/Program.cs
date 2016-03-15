@@ -124,10 +124,25 @@ namespace Critex.GameConcole
 
         private static void GetStatusServer()
         {
-            OpenConsole();
-            if (_server == null) return;
-            Console.WriteLine(_server.SendConsoleCommand("clear", true));
-            Console.WriteLine(_server.SendConsoleCommand("status", true));
+            //OpenConsole();
+            //if (_server == null) return;
+            //Console.WriteLine(_server.SendConsoleCommand("clear", true));
+            //Console.WriteLine(_server.SendConsoleCommand("status", true));
+            //CloseConsole();
+            var data = _server.GetAdvancedState(_gameparam);
+            Console.WriteLine($"Сервер {_connectparam.FamilyGame}: {data.Status}");
+            foreach (var st in data.ServerStates)
+                Console.WriteLine($"{st.ParameterName}\t: {st.ParameterValue}");
+            
+            Console.Write("|");
+            foreach (var head in data.TableInfo.Headers)
+                Console.Write($"{head}\t|");
+            Console.Write('\n');
+            if (data.TableInfo.Values.Any())
+                Console.Write("|");
+            foreach (var value in data.TableInfo.Values)
+                Console.Write($"{value}\t|");
+            Console.Write('\n');
             WriteCommand();
         }
 
@@ -152,7 +167,7 @@ namespace Critex.GameConcole
         {
             if (_server == null) return;
             _server.OpenConsole(_gameparam);
-            Console.WriteLine($"Консоль {_connectparam.FamilyGame}: ");
+            Console.Write($"Консоль {_connectparam.FamilyGame}#> ");
         }
 
         private static void _server_DataReceived(object sender, DataReceivedModel data)
@@ -201,6 +216,7 @@ namespace Critex.GameConcole
             var res = _server.GetState(_gameparam);
             if (!res.Succes)
                 Console.WriteLine($"{res.ErrorMessage}");
+            Console.WriteLine($"Сервер {_connectparam.FamilyGame}: {res.Status}");
             //if (_connectparam == null || _gameparam == null) return;
             //var res = _server.Monitor(_gameparam);
             //Console.Write($"Сервер {_connectparam.FamilyGame}:");

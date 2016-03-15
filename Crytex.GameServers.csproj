@@ -74,6 +74,7 @@
     <Compile Include="Games\BaseGameHost.cs" />
     <Compile Include="Games\CS.cs" />
     <Compile Include="Interface\IGameHost.cs" />
+    <Compile Include="Models\AdvancedStateGameResult.cs" />
     <Compile Include="Models\ChangeStatusParam.cs" />
     <Compile Include="Models\ConnectParam.cs" />
     <Compile Include="Models\CreateParam.cs" />

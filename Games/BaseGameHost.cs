@@ -17,7 +17,8 @@ namespace Crytex.GameServers.Games
     public class BaseGameHost : IGameHost
     {
         protected readonly string GameCode;
-        protected StreamWriter Writer { get; set; }
+        protected StreamWriter Writer;
+        protected StreamReader Reader;
         protected readonly SshClient Client;
         protected ShellStream Terminal;
         protected readonly string Ip;
@@ -47,10 +48,7 @@ namespace Crytex.GameServers.Games
 
         public GameResult Disconnect()
         {
-            Writer?.Close();
-            if (Terminal != null)
-                Terminal.DataReceived -= Stream_DataReceived;
-            Terminal?.Close();
+            Dispose();
             Client?.Disconnect();
             var result = new GameResult { Succes = !Client?.IsConnected ?? true };
             return result;
@@ -138,6 +136,15 @@ namespace Crytex.GameServers.Games
             return result;
         }
 
+        public virtual AdvancedStateGameResult GetAdvancedState(UserGameParam userGameParam)
+        {
+            OpenConsole(userGameParam);
+            CollectResiveString = string.Empty;
+            
+            var result = new AdvancedStateGameResult {Succes = false};
+            return result;
+        }
+
         public virtual void OpenConsole(UserGameParam param, string openCommand = "")
         {
             IDictionary<Renci.SshNet.Common.TerminalModes, uint> termkvp = new Dictionary<Renci.SshNet.Common.TerminalModes, uint>();
@@ -151,6 +158,7 @@ namespace Crytex.GameServers.Games
             IsWaitAll = true; _isReadyConsoleCommand = false;
             CollectResiveString = string.Empty;
             ReadyConsoleAnswer();
+            
         }
 
         private bool ReadyConsoleAnswer()
@@ -169,13 +177,8 @@ namespace Crytex.GameServers.Games
             var run = $"^b d";
             if (Terminal == null || Writer == StreamWriter.Null) return "";
             Writer?.WriteLine(run);
-            FoundConsoleEnd = null;
-            Terminal.DataReceived -= Stream_DataReceived;
-            Writer?.Close(); Writer?.Dispose(); Writer = StreamWriter.Null;
-            Terminal?.Close(); Terminal?.Dispose();
-            Terminal = null;
-            return "";
-            //return !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
+            Dispose();
+            return CollectResiveString;
         }
 
         public virtual string SendConsoleCommand(string command, bool waitAll = false)
@@ -192,6 +195,13 @@ namespace Crytex.GameServers.Games
             }
 
             return CollectResiveString;
+        }
+
+        protected void Stream_DataReceived(object sender, Renci.SshNet.Common.ShellDataEventArgs e)
+        {
+            CollectResiveString += EscapeUtf8(Encoding.UTF8.GetString(e.Data));
+            if (FoundConsoleEnd?.IsMatch(CollectResiveString) ?? true)
+                _isReadyConsoleCommand = true;
         }
 
         protected void ValidateError(SshCommand res, GameResult result)
@@ -212,11 +222,13 @@ namespace Crytex.GameServers.Games
             return res;
         }
 
-        protected void Stream_DataReceived(object sender, Renci.SshNet.Common.ShellDataEventArgs e)
+        private void Dispose()
         {
-            CollectResiveString += EscapeUtf8(Encoding.UTF8.GetString(e.Data));
-            if(FoundConsoleEnd?.IsMatch(CollectResiveString) ?? true)
-                _isReadyConsoleCommand = true;
+            FoundConsoleEnd = null;
+            Terminal.DataReceived -= Stream_DataReceived;
+            Writer?.Close(); Writer?.Dispose(); Writer = StreamWriter.Null;
+            Terminal?.Close(); Terminal?.Dispose();
+            Terminal = null;
         }
 
         protected virtual void OnDataReceived(DataReceivedModel data)
