@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Crytex.GameServers.Interface;
 using Crytex.GameServers.Models;
+using Crytex.Model.Enums;
 using Microsoft.Practices.ObjectBuilder2;
 using Renci.SshNet;
 
@@ -16,7 +17,7 @@ namespace Crytex.GameServers.Games
     public class Cs : BaseGameHost
     {
 
-        public Cs(ConnectParam param) : base(param, "cstrike") { FoundConsoleEnd = new Regex(@"[\d]+\s*users"); }
+        public Cs(ConnectParam param, string gameCode =  "cstrike") : base(param, gameCode) {  }
 
         //public override DataReceivedModel Go(GameHostParam param)
         //{
@@ -99,11 +100,11 @@ namespace Crytex.GameServers.Games
             result.ErrorMessage = SendConsoleCommand("status", true);
             CloseConsole(userGameParam);
             CreateTableData(result);
-            
+            result.Status = result.ServerStates.Any() ? GameHostTypeStatus.Enable : GameHostTypeStatus.Disable;
             return result;
         }
 
-        private void CreateTableData(AdvancedStateGameResult data)
+        protected virtual void CreateTableData(AdvancedStateGameResult data)
         {
             //var data = new DataReceivedModel();// {Data = _collectResiveString};
             var rg = new Regex(@"(?<name>[\w\/]+)\s*:\s*(?<value>[^\n]+)");
