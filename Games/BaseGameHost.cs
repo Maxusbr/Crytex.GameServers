@@ -93,6 +93,7 @@ namespace Crytex.GameServers.Games
             {
                 ValidateError(res, result);
             }
+            result.Data = res.Result;
             return result;
         }
 
@@ -104,9 +105,14 @@ namespace Crytex.GameServers.Games
             //Terminal = Client.CreateShellStream("xterm", 80, 24, 800, 600, 1024, termkvp);
             //Writer = new StreamWriter(Terminal) { AutoFlush = true };
             var run = $"cd /host/{GameName};" +
-                      $"./{GameName} stop -servicename cs{UserId} -port {param.GamePort};";
+                      $"./{GameName} stop -servicename {GameName}{UserId} -port {param.GamePort};";
             var res = Client.RunCommand(run);
+            if (!string.IsNullOrEmpty(res.Error))
+            {
+                ValidateError(res, result);
+            }
             //Writer.WriteLine(run);
+            result.Data = res.Result;
             return result;
         }
 

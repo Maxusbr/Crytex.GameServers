@@ -105,8 +105,7 @@ namespace Critex.GameConcole
                                 _isConsoleOpen = false;
                                 break;
                             case "0":
-                                CloseConsole();
-                                WriteCommand();
+                                CloseConnect();
                                 break;
                             case "exit":
                                 return;
@@ -122,6 +121,15 @@ namespace Critex.GameConcole
                     Console.WriteLine(e);
                 }
             }
+        }
+
+        private static void CloseConnect()
+        {
+            var res = _server.Disconnect();
+            Console.WriteLine($"Соединение закрыто: {res.Succes}");
+            _connectparam = null;
+            _gameparam = null;
+            WriteCommand();
         }
 
         private static void GetStatusServer()
@@ -219,6 +227,7 @@ namespace Critex.GameConcole
             if (!res.Succes)
                 Console.Write($"{res.ErrorMessage}\n");
             Console.Write($"{res.Status}\n");
+            WriteCommand();
         }
 
         private static void StopServer()
@@ -228,6 +237,7 @@ namespace Critex.GameConcole
             var res = _server.ChangeStatus(param);
             if (!res.Succes)
                 Console.WriteLine($"{res.ErrorMessage}");
+            WriteCommand();
         }
 
         private static ConnectParam LinuxConnecton(GameFamily game)

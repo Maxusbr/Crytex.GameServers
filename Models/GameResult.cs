@@ -12,5 +12,6 @@ namespace Crytex.GameServers.Models
         public bool Succes = true;
         public GameHostTypeError? Error { get; set; }
         public string ErrorMessage { get; set; }
+        public string Data { get; set; }
     }
 }
