@@ -17,9 +17,8 @@ namespace Crytex.GameServers.Interface
 
         StateGameResult GetState(UserGameParam userGameParam);
         AdvancedStateGameResult GetAdvancedState(UserGameParam userGameParam);
-        //event EventHandler<DataReceivedModel> DataReceived;
 
-        void OpenConsole(UserGameParam param, string openCommand = "");
+        bool OpenConsole(UserGameParam param, string openCommand = "");
         string CloseConsole(UserGameParam param, string closeCommand = "");
         string SendConsoleCommand(string command, bool waitAll = false);
     }

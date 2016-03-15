@@ -26,14 +26,14 @@ namespace Crytex.GameServers.Fabric
             {
                 case GameFamily.Cs:
                     return new Cs(param);
-                //case GameFamily.Ark:
-                //    return new Ark(param);
+                case GameFamily.Ark:
+                    return new Ark(param);
                 //case GameFamily.Arma3:
                 //    return new Arma3(param);
-                //case GameFamily.Css:
-                //    return new Css(param);
-                //case GameFamily.CsGo:
-                //    return new CsGo(param);
+                case GameFamily.Css:
+                    return new Css(param);
+                case GameFamily.CsGo:
+                    return new CsGo(param);
                 //case GameFamily.Cure:
                 //    return new Cure(param);
                 //case GameFamily.Dods:
@@ -52,8 +52,8 @@ namespace Crytex.GameServers.Fabric
                 //    return new TF2(param);
                 //case GameFamily.Bmdm:
                 //    return new Bmdm(param);
-                //case GameFamily.Cscz:
-                //    return new Cscz(param);
+                case GameFamily.Cscz:
+                    return new Cscz(param);
                 //case GameFamily.Insurgency:
                 //    return new Insurgency(param);
                 //case GameFamily.JustCause2:

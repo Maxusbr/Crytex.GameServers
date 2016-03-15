@@ -105,12 +105,14 @@ namespace Critex.GameConcole
                                 _isConsoleOpen = false;
                                 break;
                             case "0":
-
-                                return;
+                                CloseConsole();
+                                WriteCommand();
+                                break;
                             case "exit":
                                 return;
                             default:
-                                _server?.SendConsoleCommand(key);
+                                Console.WriteLine(_server?.SendConsoleCommand(key));
+                                WriteCommand();
                                 break;
                         }
                     }
@@ -126,14 +128,13 @@ namespace Critex.GameConcole
         {
             //OpenConsole();
             //if (_server == null) return;
-            //Console.WriteLine(_server.SendConsoleCommand("clear", true));
             //Console.WriteLine(_server.SendConsoleCommand("status", true));
             //CloseConsole();
             var data = _server.GetAdvancedState(_gameparam);
             Console.WriteLine($"Сервер {_connectparam.FamilyGame}: {data.Status}");
             foreach (var st in data.ServerStates)
                 Console.WriteLine($"{st.ParameterName}\t: {st.ParameterValue}");
-            
+
             Console.Write("|");
             foreach (var head in data.TableInfo.Headers)
                 Console.Write($"{head}\t|");
@@ -213,21 +214,11 @@ namespace Critex.GameConcole
 
         private static void GetStatus()
         {
+            Console.Write($"Сервер {_connectparam.FamilyGame}: ");
             var res = _server.GetState(_gameparam);
             if (!res.Succes)
-                Console.WriteLine($"{res.ErrorMessage}");
-            Console.WriteLine($"Сервер {_connectparam.FamilyGame}: {res.Status}");
-            //if (_connectparam == null || _gameparam == null) return;
-            //var res = _server.Monitor(_gameparam);
-            //Console.Write($"Сервер {_connectparam.FamilyGame}:");
-            //if (res.Data.Equals("OK"))
-            //{
-            //    Console.Write("\n");
-            //    foreach (var param in res.ServerStates)
-            //        Console.WriteLine($"{param.ParameterName}: {param.ParameterValue}");
-            //}
-            //else
-            //    Console.WriteLine($" {res}");
+                Console.Write($"{res.ErrorMessage}\n");
+            Console.Write($"{res.Status}\n");
         }
 
         private static void StopServer()
@@ -254,53 +245,53 @@ namespace Critex.GameConcole
                 case GameFamily.Cs:
                     res.GameName = "cs";
                     break;
-                    //case GameFamily.Ark:
-                    //    res.GameName = "ark";
-                    //    break;
-                    //case GameFamily.Arma3:
-                    //    res.GameName = "arma3";
-                    //    break;
+                case GameFamily.Ark:
+                    res.GameName = "ark";
+                    break;
+                case GameFamily.Arma3:
+                    res.GameName = "arma3";
+                    break;
 
-                    //case GameFamily.Css:
-                    //    res.GameName = "css";
-                    //    break;
-                    //case GameFamily.CsGo:
-                    //    res.GameName = "csgo";
-                    //    break;
-                    //case GameFamily.Cure:
-                    //    res.GameName = "cure";
-                    //    break;
-                    //case GameFamily.Dods:
-                    //    res.GameName = "dods";
-                    //    break;
-                    //case GameFamily.GMod:
-                    //    res.GameName = "gmod";
-                    //    break;
-                    //case GameFamily.L4D:
-                    //    res.GameName = "l4d";
-                    //    break;
-                    //case GameFamily.L4D2:
-                    //    res.GameName = "l4d2";
-                    //    break;
-                    //case GameFamily.Minecraft:
-                    //    break;
-                    //case GameFamily.SaMp:
-                    //    break;
-                    //case GameFamily.T2F:
-                    //    res.GameName = "t2f";
-                    //    break;
-                    //case GameFamily.Bmdm:
-                    //    res.GameName = "bmdm";
-                    //    break;
-                    //case GameFamily.Cscz:
-                    //    res.GameName = "cscz";
-                    //    break;
-                    //case GameFamily.Insurgency:
-                    //    res.GameName = "ins";
-                    //    break;
-                    //case GameFamily.JustCause2:
-                    //    res.GameName = "jc2";
-                    //    break;
+                case GameFamily.Css:
+                    res.GameName = "css";
+                    break;
+                case GameFamily.CsGo:
+                    res.GameName = "csgo";
+                    break;
+                case GameFamily.Cure:
+                    res.GameName = "cure";
+                    break;
+                case GameFamily.Dods:
+                    res.GameName = "dods";
+                    break;
+                case GameFamily.GMod:
+                    res.GameName = "gmod";
+                    break;
+                case GameFamily.L4D:
+                    res.GameName = "l4d";
+                    break;
+                case GameFamily.L4D2:
+                    res.GameName = "l4d2";
+                    break;
+                case GameFamily.Minecraft:
+                    break;
+                case GameFamily.SaMp:
+                    break;
+                case GameFamily.T2F:
+                    res.GameName = "t2f";
+                    break;
+                case GameFamily.Bmdm:
+                    res.GameName = "bmdm";
+                    break;
+                case GameFamily.Cscz:
+                    res.GameName = "cscz";
+                    break;
+                case GameFamily.Insurgency:
+                    res.GameName = "ins";
+                    break;
+                case GameFamily.JustCause2:
+                    res.GameName = "jc2";
+                    break;
             }
             return res;
         }
@@ -324,52 +315,51 @@ namespace Critex.GameConcole
                 case "3":
                     connectparam = LinuxConnecton(GameFamily.Cs);
                     break;
-                    //case "1":
-                    //    connectparam = LinuxConnecton(GameFamily.Ark);
-                    //    break;
-                    //case "2":
-                    //    connectparam = LinuxConnecton(GameFamily.Arma3);
-                    //    break;
-
-                    //case "4":
-                    //    connectparam = LinuxConnecton(GameFamily.CsGo);
-                    //    break;
-                    //case "5":
-                    //    connectparam = LinuxConnecton(GameFamily.Css);
-                    //    break;
-                    //case "6":
-                    //    connectparam = LinuxConnecton(GameFamily.Dods);
-                    //    break;
-                    //case "7":
-                    //    connectparam = LinuxConnecton(GameFamily.GMod);
-                    //    break;
-                    //case "8":
-                    //    connectparam = LinuxConnecton(GameFamily.L4D);
-                    //    break;
-                    //case "9":
-                    //    connectparam = LinuxConnecton(GameFamily.L4D2);
-                    //    break;
-                    //case "10":
-                    //    connectparam = LinuxConnecton(GameFamily.Minecraft);
-                    //    break;
-                    //case "11":
-                    //    connectparam = LinuxConnecton(GameFamily.T2F);
-                    //    break;
-                    //case "12":
-                    //    connectparam = LinuxConnecton(GameFamily.Bmdm);
-                    //    break;
-                    //case "13":
-                    //    connectparam = LinuxConnecton(GameFamily.Cscz);
-                    //    break;
-                    //case "14":
-                    //    connectparam = LinuxConnecton(GameFamily.Cure);
-                    //    break;
-                    //case "15":
-                    //    connectparam = LinuxConnecton(GameFamily.Insurgency);
-                    //    break;
-                    //case "16":
-                    //    connectparam = LinuxConnecton(GameFamily.JustCause2);
-                    //    break;
+                case "1":
+                    connectparam = LinuxConnecton(GameFamily.Ark);
+                    break;
+                case "2":
+                    connectparam = LinuxConnecton(GameFamily.Arma3);
+                    break;
+                case "4":
+                    connectparam = LinuxConnecton(GameFamily.CsGo);
+                    break;
+                case "5":
+                    connectparam = LinuxConnecton(GameFamily.Css);
+                    break;
+                case "6":
+                    connectparam = LinuxConnecton(GameFamily.Dods);
+                    break;
+                case "7":
+                    connectparam = LinuxConnecton(GameFamily.GMod);
+                    break;
+                case "8":
+                    connectparam = LinuxConnecton(GameFamily.L4D);
+                    break;
+                case "9":
+                    connectparam = LinuxConnecton(GameFamily.L4D2);
+                    break;
+                case "10":
+                    connectparam = LinuxConnecton(GameFamily.Minecraft);
+                    break;
+                case "11":
+                    connectparam = LinuxConnecton(GameFamily.T2F);
+                    break;
+                case "12":
+                    connectparam = LinuxConnecton(GameFamily.Bmdm);
+                    break;
+                case "13":
+                    connectparam = LinuxConnecton(GameFamily.Cscz);
+                    break;
+                case "14":
+                    connectparam = LinuxConnecton(GameFamily.Cure);
+                    break;
+                case "15":
+                    connectparam = LinuxConnecton(GameFamily.Insurgency);
+                    break;
+                case "16":
+                    connectparam = LinuxConnecton(GameFamily.JustCause2);
+                    break;
             }
             return connectparam;
         }

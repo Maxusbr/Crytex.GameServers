@@ -11,6 +11,7 @@ using Crytex.GameServers.Models;
 using Crytex.Model.Enums;
 using Crytex.Model.Exceptions;
 using Renci.SshNet;
+using Renci.SshNet.Common;
 
 namespace Crytex.GameServers.Games
 {
@@ -28,7 +29,6 @@ namespace Crytex.GameServers.Games
         protected bool IsWaitAll;
         protected string CollectResiveString;
         protected Regex FoundConsoleEnd;
-        private bool _isReadyConsoleCommand;
 
         public BaseGameHost(ConnectParam param, string gameCode)
         {
@@ -102,7 +102,6 @@ namespace Crytex.GameServers.Games
             //IDictionary<Renci.SshNet.Common.TerminalModes, uint> termkvp = new Dictionary<Renci.SshNet.Common.TerminalModes, uint>();
             //termkvp.Add(Renci.SshNet.Common.TerminalModes.ECHO, 53);
             //Terminal = Client.CreateShellStream("xterm", 80, 24, 800, 600, 1024, termkvp);
-            //Terminal.DataReceived += Stream_DataReceived;
             //Writer = new StreamWriter(Terminal) { AutoFlush = true };
             var run = $"cd /host/{GameName};" +
                       $"./{GameName} stop -servicename cs{UserId} -port {param.GamePort};";
@@ -145,31 +144,29 @@ namespace Crytex.GameServers.Games
             return result;
         }
 
-        public virtual void OpenConsole(UserGameParam param, string openCommand = "")
+        public virtual bool OpenConsole(UserGameParam param, string openCommand = "")
         {
-            IDictionary<Renci.SshNet.Common.TerminalModes, uint> termkvp = new Dictionary<Renci.SshNet.Common.TerminalModes, uint>();
-            termkvp.Add(Renci.SshNet.Common.TerminalModes.ECHO, 53);
+            IDictionary<TerminalModes, uint> termkvp = new Dictionary<TerminalModes, uint>();
+            termkvp.Add(TerminalModes.ECHO, 53);
             Terminal = Client.CreateShellStream("xterm", 80, 24, 800, 600, 1024, termkvp);
-            Terminal.DataReceived += Stream_DataReceived;
+
+            var tsc = new TaskCompletionSource<bool>();
+            EventHandler<ShellDataEventArgs> lambda = (obj, args) =>
+            {
+                CollectResiveString += EscapeUtf8(Encoding.UTF8.GetString(args.Data));
+                if (FoundConsoleEnd?.IsMatch(CollectResiveString) ?? true)
+                    tsc.SetResult(true);
+            };
+            Terminal.DataReceived += lambda;
+
             Writer = new StreamWriter(Terminal) { AutoFlush = true };
             if(string.IsNullOrEmpty(openCommand))
                 openCommand = $"cd /host/{GameName};./{GameName} console -servicename {GameName}{UserId} -port {param.GamePort};";
             Writer.WriteLine(openCommand);
-            IsWaitAll = true; _isReadyConsoleCommand = false;
-            CollectResiveString = string.Empty;
-            ReadyConsoleAnswer();
-            
-        }
+            var result = tsc.Task == Task.WhenAny(Task.Delay(TimeSpan.FromMinutes(2)), tsc.Task).Result;
 
-        private bool ReadyConsoleAnswer()
-        {
-            var count = 0;
-            while (IsWaitAll && !_isReadyConsoleCommand)
-            {
-                Thread.Sleep(500);
-                if (count++ > 5) return false;
-            }
-            return true;
+            Terminal.DataReceived -= lambda;
+           return result;
         }
 
         public virtual string CloseConsole(UserGameParam param, string closeCommand = "")
@@ -177,31 +174,28 @@ namespace Crytex.GameServers.Games
             var run = $"^b d";
             if (Terminal == null || Writer == StreamWriter.Null) return "";
             Writer?.WriteLine(run);
-            Dispose();
+            FoundConsoleEnd = null;
+            Writer?.Close(); Writer?.Dispose(); Writer = StreamWriter.Null;
+            Terminal?.Close(); Terminal?.Dispose();
             return CollectResiveString;
         }
 
         public virtual string SendConsoleCommand(string command, bool waitAll = false)
         {
             IsWaitAll = waitAll;
-            _isReadyConsoleCommand = false;
+            var tsc = new TaskCompletionSource<bool>();
+            EventHandler<ShellDataEventArgs> lambda = (obj, args) =>
+            {
+                CollectResiveString += EscapeUtf8(Encoding.UTF8.GetString(args.Data));
+                if (FoundConsoleEnd?.IsMatch(CollectResiveString) ?? true)
+                    tsc.SetResult(true);
+            };
+            Terminal.DataReceived += lambda;
             Writer?.WriteLine(command);
 
-            var result = new GameResult();
-            if (!ReadyConsoleAnswer())
-            {
-                result.Error = GameHostTypeError.WaitTimeOut;
-                return "ErrorWait";
-            }
-
-            return CollectResiveString;
-        }
-
-        protected void Stream_DataReceived(object sender, Renci.SshNet.Common.ShellDataEventArgs e)
-        {
-            CollectResiveString += EscapeUtf8(Encoding.UTF8.GetString(e.Data));
-            if (FoundConsoleEnd?.IsMatch(CollectResiveString) ?? true)
-                _isReadyConsoleCommand = true;
+            var result = tsc.Task != Task.WhenAny(Task.Delay(TimeSpan.FromMinutes(2)), tsc.Task).Result ? "ErrorWait" : CollectResiveString;
+            Terminal.DataReceived -= lambda;
+            return result;
         }
 
         protected void ValidateError(SshCommand res, GameResult result)
@@ -209,8 +203,6 @@ namespace Crytex.GameServers.Games
             result.Succes = false;
             result.ErrorMessage = EscapeUtf8(res.Error);
         }
-
-        public event EventHandler<DataReceivedModel> DataReceived;
 
         protected string GeneratePassword(int count)
         {
@@ -225,15 +217,9 @@ namespace Crytex.GameServers.Games
         private void Dispose()
         {
             FoundConsoleEnd = null;
-            Terminal.DataReceived -= Stream_DataReceived;
             Writer?.Close(); Writer?.Dispose(); Writer = StreamWriter.Null;
             Terminal?.Close(); Terminal?.Dispose();
             Terminal = null;
-        }
-
-        protected virtual void OnDataReceived(DataReceivedModel data)
-        {
-            DataReceived?.Invoke(this, data);
         }
 
         protected string EscapeUtf8(string data)

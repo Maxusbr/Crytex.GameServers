@@ -71,6 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Fabric\GameServerFactory.cs" />
+    <Compile Include="Games\Ark.cs" />
     <Compile Include="Games\BaseGameHost.cs" />
     <Compile Include="Games\CS.cs" />
     <Compile Include="Games\Cscz.cs" />
