@@ -28,8 +28,8 @@ namespace Crytex.GameServers.Fabric
                     return new Cs(param);
                 case GameFamily.Ark:
                     return new Ark(param);
-                //case GameFamily.Arma3:
-                //    return new Arma3(param);
+                case GameFamily.Arma3:
+                    return new Arma3(param);
                 case GameFamily.Css:
                     return new Css(param);
                 case GameFamily.CsGo:

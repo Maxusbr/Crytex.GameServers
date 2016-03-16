@@ -12,12 +12,12 @@ namespace Crytex.GameServers.Games
 {
     public class Ark : BaseGameHost
     {
-        public Ark(ConnectParam param) : base(param, "Engine") {  }
+        public Ark(ConnectParam param) : base(param, "ShooterGame") {  }
 
         public override GameResult Create(CreateParam param)
         {
             UserId = param.UserId;
-            var run = $"cd /host/{GameName}/serverfiles/ShooterGame/Saved/Config/LinuxServer;cp -r GameUserSettings.ini {GameName}{UserId}.ini";
+            var run = $"cd /host/{GameName}/serverfiles/{GameCode}/Saved/Config/LinuxServer;cp -r GameUserSettings.ini {GameName}{UserId}.ini";
             var res = Client.RunCommand(run);
             var result = new GameResult();
             if (!string.IsNullOrEmpty(res.Error))
