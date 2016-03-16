@@ -25,6 +25,7 @@ namespace Crytex.GameServers.Games
         protected readonly string Ip;
         protected readonly string Password;
         protected string GameName;
+        protected string Path;
         protected int UserId;
         protected bool IsWaitAll;
         protected string CollectResiveString;
@@ -32,6 +33,7 @@ namespace Crytex.GameServers.Games
 
         public BaseGameHost(ConnectParam param, string gameCode)
         {
+            Path = param.Path;
             GameCode = gameCode;
             GameName = param.GameName;
             Password = param.SshPassword;
@@ -57,7 +59,7 @@ namespace Crytex.GameServers.Games
         public virtual GameResult Create(CreateParam param)
         {
             UserId = param.UserId;
-            var run = $"cd /host/{GameName}/serverfiles/{GameCode}/cfg;cp -r {GameName}-server.cfg {GameName}{UserId}.cfg";
+            var run = $"cd {Path}/{GameName}/serverfiles/{GameCode}/cfg;cp -r {GameName}-server.cfg {GameName}{UserId}.cfg";
             var res = Client.RunCommand(run);
             var result = new GameResult();
             if (!string.IsNullOrEmpty(res.Error))
@@ -86,7 +88,7 @@ namespace Crytex.GameServers.Games
         protected virtual GameResult On(ChangeStatusParam param)
         {
             var result = new GameResult();
-            var run = $"cd /host/{GameName};" +
+            var run = $"cd {Path}/{GameName};" +
                       $"./{GameName} start -servicename {GameName}{UserId} -port {param.GamePort} -clientport {param.GamePort + 1};";
             var res = Client.RunCommand(run);
             if (!string.IsNullOrEmpty(res.Error))
@@ -104,7 +106,7 @@ namespace Crytex.GameServers.Games
             //termkvp.Add(Renci.SshNet.Common.TerminalModes.ECHO, 53);
             //Terminal = Client.CreateShellStream("xterm", 80, 24, 800, 600, 1024, termkvp);
             //Writer = new StreamWriter(Terminal) { AutoFlush = true };
-            var run = $"cd /host/{GameName};" +
+            var run = $"cd {Path}/{GameName};" +
                       $"./{GameName} stop -servicename {GameName}{UserId} -port {param.GamePort};";
             var res = Client.RunCommand(run);
             if (!string.IsNullOrEmpty(res.Error))
@@ -119,7 +121,7 @@ namespace Crytex.GameServers.Games
         public virtual StateGameResult GetState(UserGameParam userGameParam)
         {
             var result = new StateGameResult();
-            var run = $"cd /host/{GameName};" +
+            var run = $"cd {Path}/{GameName};" +
                          $"./{GameName} monitor -servicename {GameName}{UserId} -port {userGameParam.GamePort};";
             var res = Client.RunCommand(run);
             var states = Regex.Matches(EscapeUtf8(res.Result),
@@ -167,7 +169,7 @@ namespace Crytex.GameServers.Games
 
             Writer = new StreamWriter(Terminal) { AutoFlush = true };
             if(string.IsNullOrEmpty(openCommand))
-                openCommand = $"cd /host/{GameName};./{GameName} console -servicename {GameName}{UserId} -port {param.GamePort};";
+                openCommand = $"cd {Path}/{GameName};./{GameName} console -servicename {GameName}{UserId} -port {param.GamePort};";
             Writer.WriteLine(openCommand);
             var result = tsc.Task == Task.WhenAny(Task.Delay(TimeSpan.FromMinutes(2)), tsc.Task).Result;
 

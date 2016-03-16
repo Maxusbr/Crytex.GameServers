@@ -248,7 +248,8 @@ namespace Critex.GameConcole
                 SshIp = LinuxSrvIp,
                 SshPort = 22,
                 SshUserName = "max",
-                SshPassword = "Qwerty#1"
+                SshPassword = "Qwerty#1",
+                Path = "/host"
             };
             switch (game)
             {
@@ -313,7 +314,8 @@ namespace Critex.GameConcole
                 SshIp = Localhost,
                 SshPort = 22,
                 SshUserName = "Max",
-                SshPassword = "qwerty"
+                SshPassword = "qwerty",
+                Path = "/host"
             };
         }
 

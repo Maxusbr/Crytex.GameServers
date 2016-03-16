@@ -17,41 +17,39 @@ namespace Crytex.GameServers.Games
         public override GameResult Create(CreateParam param)
         {
             UserId = param.UserId;
-            var run = $"cd /host/{GameName}/serverfiles/{GameCode}/Saved/Config/LinuxServer;cp -r GameUserSettings.ini {GameName}{UserId}.ini";
-            var res = Client.RunCommand(run);
+            var host = $"cd {Path}/{GameName}/serverfiles/{GameCode}/Saved/Config/LinuxServer;";
+            Client.RunCommand(host + $"chmod 777 {GameName}{UserId}.ini;");
+            Client.RunCommand(host + "echo  \"[ServerSettings]\nAllowFlyerCarryPvE=False\nAllowThirdPersonPlayer=False\n" +
+                              "AlwaysNotifyPlayerLeft=False\nAutoSavePeriodMinutes=15.000000\nClampResourceHarvestDamage=False\n" +
+                              "DifficultyOffset=0.200000\nDisableStructureDecayPvE=False\nDontAlwaysNotifyPlayerJoined=False\n" +
+                              "EnablePvPGamma=False\nGlobalVoiceChat=False\nKickIdlePlayersPeriod=2400.000000\nNoTributeDownloads=False\n" +
+                              "ProximityChat=False\nProximityVoiceChat=False\nPvEStructureDecayDestructionPeriod=0.000000\n" +
+                              "RCONEnabled=True\nRCONPort=32330\nServerAdminPassword=adminpassword\nServerCrosshair=False\n" +
+                              "ServerForceNoHUD=False\nServerHardcore=False\nServerPassword=\nServerPVE=False\nShowMapPlayerLocation=False\n" +
+                              "TamedDinoDamageMultiplier=1.000000\nTamedDinoResistanceMultiplier=1.000000\n" +
+                              "[/Script/ShooterGame.ShooterGameUserSettings]\nMasterAudioVolume=1.000000\nMusicAudioVolume=1.000000\n" +
+                              "SFXAudioVolume=1.000000\nVoiceAudioVolume=1.000000\nCameraShakeScale=1.000000\nbFirstPersonRiding=False\n" +
+                              "bThirdPersonPlayer=False\nbShowStatusNotificationMessages=True\nTrueSkyQuality=0.270000\n" +
+                              "FOVMultiplier=1.000000\nGroundClutterDensity=1.000000\nbFilmGrain=False\nbMotionBlur=True\nbUseDFAO=True\n" +
+                              "bUseSSAO=True\nbShowChatBox=True\nbCameraViewBob=True\nbInvertLookY=False\nbFloatingNames=True\n" +
+                              "bChatBubbles=True\nbHideServerInfo=False\nbJoinNotifications=False\nbCraftablesShowAllItems=True\n" +
+                              "LookLeftRightSensitivity=1.000000\nLookUpDownSensitivity=1.000000\nGraphicsQuality=2\n" +
+                              "ActiveLingeringWorldTiles=10\nClientNetQuality=3\nLastServerSearchType=0\nLastServerSearchHideFull=False\n" +
+                              "LastServerSearchProtected=False\nHideItemTextOverlay=False\nbDistanceFieldShadowing=True\nLODScalar=1.000000\n" +
+                              "HighQualityMaterials=True\nHighQualitySurfaces=True\nbTemperatureF=False\nbDisableTorporEffect=False\n" +
+                              "bChatShowSteamName=False\nbChatShowTribeName=True\nEmoteKeyBind1=0\nEmoteKeyBind2=0\nbUseVSync=False\n" +
+                              "ResolutionSizeX=1280\nResolutionSizeY=720\nLastUserConfirmedResolutionSizeX=1280\n" +
+                              "LastUserConfirmedResolutionSizeY=720\nWindowPosX=-1\nWindowPosY=-1\nbUseDesktopResolutionForFullscreen=False\n" +
+                              "FullscreenMode=2\nLastConfirmedFullscreenMode=2\nVersion=5\n\n[ScalabilityGroups]\nsg.ResolutionQuality=100\n" +
+                              "sg.ViewDistanceQuality=3\nsg.AntiAliasingQuality=3\nsg.ShadowQuality=3\nsg.PostProcessQuality=3\n" +
+                              "sg.TextureQuality=3\nsg.EffectsQuality=3\nsg.TrueSkyQuality=3\nsg.GroundClutterQuality=3\nsg.IBLQuality=1\n" +
+                              $"sg.HeightFieldShadowQuality=3\n\" > {GameName}{UserId}.ini;");
+            Client.RunCommand(host + $"echo \"[SessionSettings]\nSessionName=arkserver\nQueryPort={param.GamePort+1}\nPort={param.GamePort}\n" +
+                              $"[/Script/Engine.GameSession]\nMaxPlayers=127\n[MessageOfTheDay]\nMessage=Welcome to ARK Server\n" +
+                              $"Duration=5\n\" >> {GameName}{UserId}.ini;");
+
             var result = new GameResult();
-            if (!string.IsNullOrEmpty(res.Error))
-            {
-                ValidateError(res, result);
-            }
             return result;
         }
-
-        //public override DataReceivedModel Go(GameHostParam param)
-        //{
-        //    return base.Go(param);
-        //    //var run = $"cd /host/{GameName}/serverfiles//Saved/Config/LinuxServer;cp -r GameUserSettings.ini s{userId}.ini";
-        //    //var res = Client.RunCommand(run);
-        //    //if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
-        //}
-
-        //public override DataReceivedModel On(GameHostParam param)
-        //{
-        //    var resModel = base.On(param);
-        //    var run = $"cd /host/{GameName};screen -dmS server_start_ark{UserId} " +
-        //              $"./{GameName} start -servicename ark{UserId} -port {param.GamePort} -clientport {param.GamePort + 1};";
-        //    var res = Client.RunCommand(run);
-        //    resModel.Data = !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
-        //    return resModel;
-        //}
-
-        //public override void Off(GameHostParam param)
-        //{
-        //    base.Off(param);
-        //    var run = $"cd /host/{GameName};screen -dmS server_stop_ark{UserId} " +
-        //              $"./{GameName} stop -servicename ark{UserId} -port {param.GamePort};";
-        //    var res = Client.RunCommand(run);
-        //    Console.WriteLine(!string.IsNullOrEmpty(res.Error) ? res.Error : res.Result);
-        //}
     }
 }

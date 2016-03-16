@@ -17,9 +17,9 @@ namespace Crytex.GameServers.Games
         public override GameResult Create(CreateParam param)
         {
             UserId = param.UserId;
-            var run = $"cd /host/{GameName}/serverfiles/cfg;cp -r arma3-server.server.cfg {GameName}{UserId}.server.cfg";
+            var run = $"cd {Path}/{GameName}/serverfiles/cfg;cp -r arma3-server.server.cfg {GameName}{UserId}.server.cfg";
             var res = Client.RunCommand(run);
-            var host = $"cd /host/{GameName}/serverfiles/cfg;";
+            var host = $"cd {Path}/{GameName}/serverfiles/cfg;";
             Client.RunCommand(host + $"chmod 777 {GameName}{UserId}.server.cfg;");
             Client.RunCommand(host + $"echo  \"serverport={param.GamePort};\" > {GameName}{UserId}.server.cfg;");
             Client.RunCommand(host + $"echo \"steamqueryport={param.GamePort+1};\" >> {GameName}{UserId}.server.cfg;");
@@ -57,7 +57,7 @@ namespace Crytex.GameServers.Games
                               $"{GameName}{UserId}.server.cfg;");
             var result = new GameResult();
 
-            run = $"cd /host/{GameName}/serverfiles/cfg;cp -r arma3-server.network.cfg {GameName}{UserId}.network.cfg";
+            run = $"cd {Path}/{GameName}/serverfiles/cfg;cp -r arma3-server.network.cfg {GameName}{UserId}.network.cfg";
             res = Client.RunCommand(run);
             
             if (!string.IsNullOrEmpty(res.Error))

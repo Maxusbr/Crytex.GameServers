@@ -50,8 +50,8 @@ namespace Crytex.GameServers.Fabric
                 //    return new SAMP(param);
                 //case GameFamily.T2F:
                 //    return new TF2(param);
-                //case GameFamily.Bmdm:
-                //    return new Bmdm(param);
+                case GameFamily.Bmdm:
+                    return new Bmdm(param);
                 case GameFamily.Cscz:
                     return new Cscz(param);
                 //case GameFamily.Insurgency:
