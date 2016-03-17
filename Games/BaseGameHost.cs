@@ -8,81 +8,209 @@ using System.Threading;
 using System.Threading.Tasks;
 using Crytex.GameServers.Interface;
 using Crytex.GameServers.Models;
+using Crytex.Model.Enums;
+using Crytex.Model.Exceptions;
 using Renci.SshNet;
+using Renci.SshNet.Common;
 
 namespace Crytex.GameServers.Games
 {
     public class BaseGameHost : IGameHost
     {
-        protected StreamWriter Writer { get; set; }
+        protected readonly string GameCode;
+        protected StreamWriter Writer;
+        protected StreamReader Reader;
         protected readonly SshClient Client;
         protected ShellStream Terminal;
         protected readonly string Ip;
         protected readonly string Password;
         protected string GameName;
+        protected string Path;
         protected int UserId;
-        public BaseGameHost(ConnectParam param)
+        protected bool IsWaitAll;
+        protected string CollectResiveString;
+        protected Regex FoundConsoleEnd;
+
+        public BaseGameHost(ConnectParam param, string gameCode)
         {
+            Path = param.Path;
+            GameCode = gameCode;
             GameName = param.GameName;
             Password = param.SshPassword;
             Ip = param.SshIp;
             Client = new SshClient(param.SshIp, param.SshPort, param.SshUserName, param.SshPassword);
-            Client.Connect();
         }
 
-        public virtual DataReceivedModel Go(GameHostParam param)
+        public GameResult Connect()
+        {
+            Client.Connect();
+            var result = new GameResult { Succes = Client.IsConnected };
+            return result;
+        }
+
+        public GameResult Disconnect()
+        {
+            Dispose();
+            Client?.Disconnect();
+            var result = new GameResult { Succes = !Client?.IsConnected ?? true };
+            return result;
+        }
+
+        public virtual GameResult Create(CreateParam param)
         {
             UserId = param.UserId;
-            return new DataReceivedModel();
+            var run = $"cd {Path}/{GameName}/serverfiles/{GameCode}/cfg;cp -r {GameName}-server.cfg {GameName}{UserId}.cfg";
+            var res = Client.RunCommand(run);
+            var result = new GameResult();
+            if (!string.IsNullOrEmpty(res.Error))
+            {
+                ValidateError(res, result);
+            }
+            return result;
         }
 
-        public virtual DataReceivedModel On(GameHostParam param)
+
+        public GameResult ChangeStatus(ChangeStatusParam param)
         {
-            if (UserId == 0) UserId = param.UserId;
-            return new DataReceivedModel();
+            GameResult result = null;
+            switch (param.TypeStatus)
+            {
+                case GameHostTypeStatus.Enable:
+                    result = On(param);
+                    break;
+                case GameHostTypeStatus.Disable:
+                    result = Off(param);
+                    break;
+            }
+            return result;
         }
 
-        public virtual void Off(GameHostParam param)
+        protected virtual GameResult On(ChangeStatusParam param)
         {
-            if (UserId == 0) UserId = param.UserId;
-            IDictionary<Renci.SshNet.Common.TerminalModes, uint> termkvp = new Dictionary<Renci.SshNet.Common.TerminalModes, uint>();
-            termkvp.Add(Renci.SshNet.Common.TerminalModes.ECHO, 53);
+            var result = new GameResult();
+            var run = $"cd {Path}/{GameName};" +
+                      $"./{GameName} start -servicename {GameName}{UserId} -port {param.GamePort} -clientport {param.GamePort + 1};";
+            var res = Client.RunCommand(run);
+            if (!string.IsNullOrEmpty(res.Error))
+            {
+                ValidateError(res, result);
+            }
+            result.Data = res.Result;
+            return result;
+        }
+
+        protected virtual GameResult Off(ChangeStatusParam param)
+        {
+            var result = new GameResult();
+            //IDictionary<Renci.SshNet.Common.TerminalModes, uint> termkvp = new Dictionary<Renci.SshNet.Common.TerminalModes, uint>();
+            //termkvp.Add(Renci.SshNet.Common.TerminalModes.ECHO, 53);
+            //Terminal = Client.CreateShellStream("xterm", 80, 24, 800, 600, 1024, termkvp);
+            //Writer = new StreamWriter(Terminal) { AutoFlush = true };
+            var run = $"cd {Path}/{GameName};" +
+                      $"./{GameName} stop -servicename {GameName}{UserId} -port {param.GamePort};";
+            var res = Client.RunCommand(run);
+            if (!string.IsNullOrEmpty(res.Error))
+            {
+                ValidateError(res, result);
+            }
+            //Writer.WriteLine(run);
+            result.Data = res.Result;
+            return result;
+        }
+
+        public virtual StateGameResult GetState(UserGameParam userGameParam)
+        {
+            var result = new StateGameResult();
+            var run = $"cd {Path}/{GameName};" +
+                         $"./{GameName} monitor -servicename {GameName}{UserId} -port {userGameParam.GamePort};";
+            var res = Client.RunCommand(run);
+            var states = Regex.Matches(EscapeUtf8(res.Result),
+                @"\r\[\s*(?<value>\w+)\s*\][^\r]*Monitor[^\:\r]+:\s*(?<name>[\w\s]+)[^\r]*\n")
+                .Cast<Match>()
+                .Select(m => new ServerStateModel
+                {
+                    ParameterName = m.Groups["name"].Value,
+                    ParameterValue = m.Groups["value"].Value
+                }).ToList();
+            if (!states.All(o => o.ParameterValue.Equals("OK")))
+            {
+                foreach (var st in states)
+                    result.ErrorMessage += $"{st.ParameterName}: {st.ParameterValue}\n";
+                result.Status = GameHostTypeStatus.Disable;
+                return result;
+            }
+            result.Status = GameHostTypeStatus.Enable;
+            return result;
+        }
+
+        public virtual AdvancedStateGameResult GetAdvancedState(UserGameParam userGameParam)
+        {
+            OpenConsole(userGameParam);
+            CollectResiveString = string.Empty;
+            
+            var result = new AdvancedStateGameResult {Succes = false};
+            return result;
+        }
+
+        public virtual bool OpenConsole(UserGameParam param, string openCommand = "")
+        {
+            IDictionary<TerminalModes, uint> termkvp = new Dictionary<TerminalModes, uint>();
+            termkvp.Add(TerminalModes.ECHO, 53);
             Terminal = Client.CreateShellStream("xterm", 80, 24, 800, 600, 1024, termkvp);
-            Terminal.DataReceived += Stream_DataReceived;
+
+            var tsc = new TaskCompletionSource<bool>();
+            EventHandler<ShellDataEventArgs> lambda = (obj, args) =>
+            {
+                CollectResiveString += EscapeUtf8(Encoding.UTF8.GetString(args.Data));
+                if (FoundConsoleEnd?.IsMatch(CollectResiveString) ?? true)
+                    tsc.SetResult(true);
+            };
+            Terminal.DataReceived += lambda;
+
             Writer = new StreamWriter(Terminal) { AutoFlush = true };
+            if(string.IsNullOrEmpty(openCommand))
+                openCommand = $"cd {Path}/{GameName};./{GameName} console -servicename {GameName}{UserId} -port {param.GamePort};";
+            Writer.WriteLine(openCommand);
+            var result = tsc.Task == Task.WhenAny(Task.Delay(TimeSpan.FromMinutes(2)), tsc.Task).Result;
+
+            Terminal.DataReceived -= lambda;
+           return result;
         }
 
-        public virtual DataReceivedModel Monitor(GameHostParam param) { if (UserId == 0) UserId = param.UserId; return new DataReceivedModel(); }
-        public virtual void OpenConsole(GameHostParam param)
-        {
-            if(UserId == 0) UserId = param.UserId;
-            IDictionary<Renci.SshNet.Common.TerminalModes, uint> termkvp = new Dictionary<Renci.SshNet.Common.TerminalModes, uint>();
-            termkvp.Add(Renci.SshNet.Common.TerminalModes.ECHO, 53);
-            Terminal = Client.CreateShellStream("xterm", 80, 24, 800, 600, 1024, termkvp);
-            Terminal.DataReceived += Stream_DataReceived;
-            Writer = new StreamWriter(Terminal) { AutoFlush = true };
-        }
-
-        public virtual string CloseConsole(GameHostParam param)
+        public virtual string CloseConsole(UserGameParam param, string closeCommand = "")
         {
             var run = $"^b d";
             if (Terminal == null || Writer == StreamWriter.Null) return "";
             Writer?.WriteLine(run);
-            Terminal.DataReceived -= Stream_DataReceived;
+            FoundConsoleEnd = null;
             Writer?.Close(); Writer?.Dispose(); Writer = StreamWriter.Null;
             Terminal?.Close(); Terminal?.Dispose();
-            Terminal = null;
-            return "";
-            //return !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
+            return CollectResiveString;
         }
 
         public virtual string SendConsoleCommand(string command, bool waitAll = false)
         {
+            IsWaitAll = waitAll;
+            var tsc = new TaskCompletionSource<bool>();
+            EventHandler<ShellDataEventArgs> lambda = (obj, args) =>
+            {
+                CollectResiveString += EscapeUtf8(Encoding.UTF8.GetString(args.Data));
+                if (FoundConsoleEnd?.IsMatch(CollectResiveString) ?? true)
+                    tsc.SetResult(true);
+            };
+            Terminal.DataReceived += lambda;
             Writer?.WriteLine(command);
-            return "";
+
+            var result = tsc.Task != Task.WhenAny(Task.Delay(TimeSpan.FromMinutes(2)), tsc.Task).Result ? "ErrorWait" : CollectResiveString;
+            Terminal.DataReceived -= lambda;
+            return result;
         }
 
-        public event EventHandler<DataReceivedModel> DataReceived;
+        protected void ValidateError(SshCommand res, GameResult result)
+        {
+            result.Succes = false;
+            result.ErrorMessage = EscapeUtf8(res.Error);
+        }
 
         protected string GeneratePassword(int count)
         {
@@ -94,15 +222,12 @@ namespace Crytex.GameServers.Games
             return res;
         }
 
-        protected void Stream_DataReceived(object sender, Renci.SshNet.Common.ShellDataEventArgs e)
+        private void Dispose()
         {
-            var res = new DataReceivedModel {Data = EscapeUtf8(Encoding.UTF8.GetString(e.Data))};
-            OnDataReceived(res);
-        }
-
-        protected virtual void OnDataReceived(DataReceivedModel data)
-        {
-            DataReceived?.Invoke(this, data);
+            FoundConsoleEnd = null;
+            Writer?.Close(); Writer?.Dispose(); Writer = StreamWriter.Null;
+            Terminal?.Close(); Terminal?.Dispose();
+            Terminal = null;
         }
 
         protected string EscapeUtf8(string data)
@@ -111,16 +236,5 @@ namespace Crytex.GameServers.Games
             var res = reg.Replace(data, "");
             return res;
         }
-
-        public void Dispose()
-        {
-            Writer?.Close(); Writer?.Dispose();
-            if (Terminal != null)
-                Terminal.DataReceived -= Stream_DataReceived;
-            Terminal?.Close(); Terminal?.Dispose();
-            Client?.Disconnect();
-            //Client?.Dispose();
-        }
-
     }
 }

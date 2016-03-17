@@ -13,11 +13,12 @@ namespace Critex.GameConcole
 {
     class Program
     {
-        private const string LinuxSrvIp = "194.15.147.231";
+        //private const string LinuxSrvIp = "194.15.147.231";
+        private const string LinuxSrvIp = "149.202.66.34";
         private const string Localhost = "192.168.1.131";
 
         private static ConnectParam _connectparam;
-        private static GameHostParam _gameparam;
+        private static CreateParam _gameparam;
         private static IGameHost _server;
 
         static void Main(string[] args)
@@ -33,27 +34,43 @@ namespace Critex.GameConcole
             _connectparam = GetLinuxConnect(key);
             if (_connectparam == null) return;
             _server = GameServerFactory.Instance.Get(_connectparam);
-            _gameparam = new GameHostParam
+            var res = _server.Connect();
+            _gameparam = new CreateParam
             {
-                GameId = 2000,
                 Slots = 2,
                 GamePort = 27020,
-                ServerId = Guid.NewGuid().ToString(),
                 UserId = 1002,
                 GamePassword = "",
                 MinCpu = 1
             };
-            _server.Go(_gameparam);
-            _server.DataReceived += _server_DataReceived;
-            var res = _server.On(_gameparam);
-            if (res.ServerStates == null) return;
-            foreach (var param in res.ServerStates)
-                Console.WriteLine($"{param.ParameterName}: {param.ParameterValue}");
+            res = _server.Create(_gameparam);
+            if (!res.Succes)
+                Console.WriteLine($"{res.ErrorMessage}");
+            var param = GetChangeStatusParam();
+            param.TypeStatus = GameHostTypeStatus.Enable;
+            res = _server.ChangeStatus(param);
+            if (!res.Succes)
+                Console.WriteLine($"{res.ErrorMessage}");
+            //_server.DataReceived += _server_DataReceived;
+            //var res = _server.On(_gameparam);
+            //if (res.ServerStates == null) return;
+            //foreach (var param in res.ServerStates)
+            //    Console.WriteLine($"{param.ParameterName}: {param.ParameterValue}");
+        }
+
+        private static ChangeStatusParam GetChangeStatusParam()
+        {
+            return new ChangeStatusParam
+            {
+                GamePort = _gameparam.GamePort,
+                UserId = _gameparam.UserId,
+                GamePassword = _gameparam.GamePassword
+            };
         }
 
         private static void ReadLine()
         {
-            
+
             while (true)
             {
                 if (_isWriteCommand) WriteCommand();
@@ -88,10 +105,15 @@ namespace Critex.GameConcole
                                 CloseConsole();
                                 _isConsoleOpen = false;
                                 break;
+                            case "0":
+                                CloseConnect();
+                                _isWriteCommand = true;
+                                break;
                             case "exit":
                                 return;
                             default:
-                                _server?.SendConsoleCommand(key);
+                                Console.WriteLine(_server?.SendConsoleCommand(key));
+                                WriteCommand();
                                 break;
                         }
                     }
@@ -103,15 +125,35 @@ namespace Critex.GameConcole
             }
         }
 
+        private static void CloseConnect()
+        {
+            var res = _server.Disconnect();
+            Console.WriteLine($"Соединение закрыто: {res.Succes}");
+            _connectparam = null;
+            _gameparam = null;
+        }
+
         private static void GetStatusServer()
         {
-            OpenConsole();
-            while (!_isConsoleOpen)
-            {
-                Thread.Sleep(1000);
-            }
-            _server?.SendConsoleCommand("clear");
-            _server?.SendConsoleCommand("status", true);
+            //OpenConsole();
+            //if (_server == null) return;
+            //Console.WriteLine(_server.SendConsoleCommand("status", true));
+            //CloseConsole();
+            var data = _server.GetAdvancedState(_gameparam);
+            Console.WriteLine($"Сервер {_connectparam.FamilyGame}: {data.Status}");
+            foreach (var st in data.ServerStates)
+                Console.WriteLine($"{st.ParameterName}\t: {st.ParameterValue}");
+
+            Console.Write("|");
+            foreach (var head in data.TableInfo.Headers)
+                Console.Write($"{head}\t|");
+            Console.Write('\n');
+            if (data.TableInfo.Values.Any())
+                Console.Write("|");
+            foreach (var value in data.TableInfo.Values)
+                Console.Write($"{value}\t|");
+            Console.Write('\n');
+            WriteCommand();
         }
 
         static bool _isWriteCommand = true;
@@ -120,7 +162,7 @@ namespace Critex.GameConcole
         {
             Console.Write("\n");
             Console.Write(_connectparam == null ? " 1 - Старт сервер \n" : " 2 - Стоп сервер\n 3 - Состояние\n" +
-                                                  " 4 - Открыть консоль\n 5 - Статус сервера\n 6 - Закрыть консоль\n");
+                                                  " 4 - Открыть консоль\n 5 - Статус сервера\n 6 - Закрыть консоль\n 0 - Закрыть соединение\n");
             Console.Write(" >> ");
         }
 
@@ -135,7 +177,7 @@ namespace Critex.GameConcole
         {
             if (_server == null) return;
             _server.OpenConsole(_gameparam);
-            Console.WriteLine($"Сервер {_connectparam.FamilyGame}: ");
+            Console.Write($"Консоль {_connectparam.FamilyGame}#> ");
         }
 
         private static void _server_DataReceived(object sender, DataReceivedModel data)
@@ -149,10 +191,9 @@ namespace Critex.GameConcole
             var state = data.ServerStates?.FirstOrDefault(o => o.ParameterName.Equals("ServerOFF"));
             if (state != null)
             {
-                _server.DataReceived -= _server_DataReceived;
+                //_server.DataReceived -= _server_DataReceived;
                 Console.WriteLine($"Сервер {_connectparam.FamilyGame} остановлен.");
                 _connectparam = null;
-                _server.Dispose();
                 _server = null;
                 _isWriteCommand = true;
                 WriteCommand();
@@ -171,35 +212,33 @@ namespace Critex.GameConcole
                 foreach (var head in data.TableInfo.Headers)
                     Console.Write($"{head}\t|");
                 Console.Write('\n');
-                if(data.TableInfo.Values.Any())
-                Console.Write("|");
+                if (data.TableInfo.Values.Any())
+                    Console.Write("|");
                 foreach (var value in data.TableInfo.Values)
                     Console.Write($"{value}\t|");
-                Console.Write('\n');                
+                Console.Write('\n');
                 WriteCommand();
             }
         }
 
         private static void GetStatus()
         {
-            if (_connectparam == null || _gameparam == null) return;
-            var res = _server.Monitor(_gameparam);
-            Console.Write($"Сервер {_connectparam.FamilyGame}:");
-            if (res.Data.Equals("OK"))
-            {
-                Console.Write("\n");
-                foreach (var param in res.ServerStates)
-                    Console.WriteLine($"{param.ParameterName}: {param.ParameterValue}");
-            }
-            else
-                Console.WriteLine($" {res}");
+            Console.Write($"Сервер {_connectparam.FamilyGame}: ");
+            var res = _server.GetState(_gameparam);
+            if (!res.Succes)
+                Console.Write($"{res.ErrorMessage}\n");
+            Console.Write($"{res.Status}\n");
+            WriteCommand();
         }
 
         private static void StopServer()
         {
-            if (_connectparam == null || _gameparam == null) return;
-            _server.Off(_gameparam);
-            
+            var param = GetChangeStatusParam();
+            param.TypeStatus = GameHostTypeStatus.Disable;
+            var res = _server.ChangeStatus(param);
+            if (!res.Succes)
+                Console.WriteLine($"{res.ErrorMessage}");
+            WriteCommand();
         }
 
         private static ConnectParam LinuxConnecton(GameFamily game)
@@ -208,21 +247,27 @@ namespace Critex.GameConcole
             {
                 FamilyGame = game,
                 SshIp = LinuxSrvIp,
-                SshPort = 22,
-                SshUserName = "max",
-                SshPassword = "Qwerty#1"
+                SshPort = 20002,
+                //SshPort = 22,
+                //SshUserName = "max",
+                //SshPassword = "Qwerty#1",
+                //Path = "/host"
+                SshUserName = "vncuser",
+                SshPassword = "QwerT@12",
+                Path = "/home/vncuser/host"
             };
             switch (game)
             {
+                case GameFamily.Cs:
+                    res.GameName = "cs";
+                    break;
                 case GameFamily.Ark:
                     res.GameName = "ark";
                     break;
                 case GameFamily.Arma3:
                     res.GameName = "arma3";
                     break;
-                case GameFamily.Cs:
-                    res.GameName = "cs";
-                    break;
+
                 case GameFamily.Css:
                     res.GameName = "css";
                     break;
@@ -274,7 +319,8 @@ namespace Critex.GameConcole
                 SshIp = Localhost,
                 SshPort = 22,
                 SshUserName = "Max",
-                SshPassword = "qwerty"
+                SshPassword = "qwerty",
+                Path = "/host"
             };
         }
 
@@ -283,14 +329,14 @@ namespace Critex.GameConcole
             ConnectParam connectparam = null;
             switch (key)
             {
+                case "3":
+                    connectparam = LinuxConnecton(GameFamily.Cs);
+                    break;
                 case "1":
                     connectparam = LinuxConnecton(GameFamily.Ark);
                     break;
                 case "2":
                     connectparam = LinuxConnecton(GameFamily.Arma3);
-                    break;
-                case "3":
-                    connectparam = LinuxConnecton(GameFamily.Cs);
                     break;
                 case "4":
                     connectparam = LinuxConnecton(GameFamily.CsGo);

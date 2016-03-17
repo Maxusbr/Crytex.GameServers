@@ -8,15 +8,18 @@ using Crytex.GameServers.Models;
 
 namespace Crytex.GameServers.Interface
 {
-    public interface IGameHost : IDisposable
+    public interface IGameHost
     {
-        event EventHandler<DataReceivedModel> DataReceived;
-        DataReceivedModel Go(GameHostParam param);
-        DataReceivedModel On(GameHostParam param);
-        void Off(GameHostParam param);
-        DataReceivedModel Monitor(GameHostParam param);
-        void OpenConsole(GameHostParam param);
-        string CloseConsole(GameHostParam param);
+        GameResult Connect();
+        GameResult Disconnect();
+        GameResult Create(CreateParam param);//Go
+        GameResult ChangeStatus(ChangeStatusParam param);//On/of
+
+        StateGameResult GetState(UserGameParam userGameParam);
+        AdvancedStateGameResult GetAdvancedState(UserGameParam userGameParam);
+
+        bool OpenConsole(UserGameParam param, string openCommand = "");
+        string CloseConsole(UserGameParam param, string closeCommand = "");
         string SendConsoleCommand(string command, bool waitAll = false);
     }
 }
