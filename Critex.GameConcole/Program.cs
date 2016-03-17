@@ -13,7 +13,8 @@ namespace Critex.GameConcole
 {
     class Program
     {
-        private const string LinuxSrvIp = "194.15.147.231";
+        //private const string LinuxSrvIp = "194.15.147.231";
+        private const string LinuxSrvIp = "149.202.66.34";
         private const string Localhost = "192.168.1.131";
 
         private static ConnectParam _connectparam;
@@ -106,6 +107,7 @@ namespace Critex.GameConcole
                                 break;
                             case "0":
                                 CloseConnect();
+                                _isWriteCommand = true;
                                 break;
                             case "exit":
                                 return;
@@ -129,7 +131,6 @@ namespace Critex.GameConcole
             Console.WriteLine($"Соединение закрыто: {res.Succes}");
             _connectparam = null;
             _gameparam = null;
-            WriteCommand();
         }
 
         private static void GetStatusServer()
@@ -246,10 +247,14 @@ namespace Critex.GameConcole
             {
                 FamilyGame = game,
                 SshIp = LinuxSrvIp,
-                SshPort = 22,
-                SshUserName = "max",
-                SshPassword = "Qwerty#1",
-                Path = "/host"
+                SshPort = 20002,
+                //SshPort = 22,
+                //SshUserName = "max",
+                //SshPassword = "Qwerty#1",
+                //Path = "/host"
+                SshUserName = "vncuser",
+                SshPassword = "QwerT@12",
+                Path = "/home/vncuser/host"
             };
             switch (game)
             {
