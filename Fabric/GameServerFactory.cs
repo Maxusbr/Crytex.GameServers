@@ -40,16 +40,16 @@ namespace Crytex.GameServers.Fabric
                 //    return new Dods(param);
                 case GameFamily.GMod:
                     return new Gmod(param);
-                //case GameFamily.L4D:
-                //    return new L4D(param);
-                //case GameFamily.L4D2:
-                //    return new L4d2(param);
+                case GameFamily.L4D:
+                    return new L4D(param);
+                case GameFamily.L4D2:
+                    return new L4D2(param);
                 //case GameFamily.Minecraft:
                 //    return new Minecraft(param);
                 //case GameFamily.SaMp:
                 //    return new SAMP(param);
-                //case GameFamily.T2F:
-                //    return new TF2(param);
+                case GameFamily.T2F:
+                    return new TF2(param);
                 case GameFamily.Bmdm:
                     return new Bmdm(param);
                 case GameFamily.Cscz:

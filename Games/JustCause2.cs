@@ -16,15 +16,15 @@ namespace Crytex.GameServers.Games
 
         public override GameResult Create(CreateParam param)
         {
-            UserId = param.UserId;
-            var run = $"cd {Path}/jc2users/;find {UserId}";
+            GameServerId = param.GameServerId;
+            var run = $"cd {Path}/jc2users/;find {GameServerId}";
             var res = Client.RunCommand(run);
             if (!string.IsNullOrEmpty(res.Error))
             {
-                run = $"cd {Path}/;mkdir jc2users/{UserId};cp -r jc2 jc2users/{UserId}/{GameName}";
+                run = $"cd {Path}/;mkdir jc2users/{GameServerId};cp -r jc2 jc2users/{GameServerId}/{GameName}";
                 Client.RunCommand(run);
             }
-            Path = $"{Path}/jc2users/{UserId}";
+            Path = $"{Path}/jc2users/{GameServerId}";
             var host = $"cd {Path}/{GameName}/serverfiles;";
             Client.RunCommand(host + "chmod 777 config.lua;");
             Client.RunCommand(host + "echo \"Server={\" > config.lua;");

@@ -39,9 +39,8 @@ namespace Critex.GameConcole
             {
                 Slots = 2,
                 GamePort = 27020,
-                UserId = 1002,
+                GameServerId = 1002,
                 GamePassword = "",
-                MinCpu = 1
             };
             res = _server.Create(_gameparam);
             if (!res.Succes)
@@ -63,7 +62,7 @@ namespace Critex.GameConcole
             return new ChangeStatusParam
             {
                 GamePort = _gameparam.GamePort,
-                UserId = _gameparam.UserId,
+                GameServerId = _gameparam.GameServerId,
                 GamePassword = _gameparam.GamePassword
             };
         }
@@ -294,7 +293,7 @@ namespace Critex.GameConcole
                 case GameFamily.SaMp:
                     break;
                 case GameFamily.T2F:
-                    res.GameName = "t2f";
+                    res.GameName = "tf2";
                     break;
                 case GameFamily.Bmdm:
                     res.GameName = "bmdm";

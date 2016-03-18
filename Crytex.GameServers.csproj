@@ -83,6 +83,9 @@
     <Compile Include="Games\Gmod.cs" />
     <Compile Include="Games\Insurgency.cs" />
     <Compile Include="Games\JustCause2.cs" />
+    <Compile Include="Games\L4D.cs" />
+    <Compile Include="Games\L4D2.cs" />
+    <Compile Include="Games\TF2.cs" />
     <Compile Include="Interface\IGameHost.cs" />
     <Compile Include="Models\AdvancedStateGameResult.cs" />
     <Compile Include="Models\ChangeStatusParam.cs" />
