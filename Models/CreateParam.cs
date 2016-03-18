@@ -9,6 +9,6 @@ namespace Crytex.GameServers.Models
     public class CreateParam : UserGameParam
     {
         public int Slots { get; set; }
-        public int MinCpu { get; set; }
+    
     }
 }

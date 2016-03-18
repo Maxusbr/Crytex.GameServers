@@ -21,7 +21,7 @@ namespace Crytex.GameServers.Games
 
         public override bool OpenConsole(UserGameParam param, string openCommand = "")
         {
-            FoundConsoleEnd = new Regex(@"\[" + $"{GameName}{UserId}" + @"\].+");
+            FoundConsoleEnd = new Regex(@"\[" + $"{GameName}{GameServerId}" + @"\].+");
             return base.OpenConsole(param);
         }
 
