@@ -12,19 +12,25 @@ namespace Crytex.GameServers.Games
 {
     public class JustCause2 : BaseGameHost
     {
-        public JustCause2(ConnectParam param) : base(param) { }
+        public JustCause2(ConnectParam param) : base(param, "jc2") { }
 
-        public override DataReceivedModel Go(GameHostParam param)
+        public override GameResult Create(CreateParam param)
         {
-            var resModel = base.Go(param);
-            var run = $"cd /host/;cp -r jc2 jc2{UserId}";
+            UserId = param.UserId;
+            var run = $"cd {Path}/jc2users/;find {UserId}";
             var res = Client.RunCommand(run);
-            var host = $"cd /host/jc2{UserId}/serverfiles;";
+            if (!string.IsNullOrEmpty(res.Error))
+            {
+                run = $"cd {Path}/;mkdir jc2users/{UserId};cp -r jc2 jc2users/{UserId}/{GameName}";
+                Client.RunCommand(run);
+            }
+            Path = $"{Path}/jc2users/{UserId}";
+            var host = $"cd {Path}/{GameName}/serverfiles;";
             Client.RunCommand(host + "chmod 777 config.lua;");
             Client.RunCommand(host + "echo \"Server={\" > config.lua;");
             Client.RunCommand(host + "echo \"MaxPlayers=5000,\" >> config.lua;");
             Client.RunCommand(host + "echo \"BindIP= \\\"\\\",\" >> config.lua;");
-            Client.RunCommand(host +$"echo \"BindPort={param.GamePort},\" >> config.lua;");
+            Client.RunCommand(host + $"echo \"BindPort={param.GamePort},\" >> config.lua;");
             Client.RunCommand(host + "echo \"Timeout=10000,\" >> config.lua;");
             Client.RunCommand(host + "echo \"Name= \\\"JC2 - MP Server\\\",\" >> config.lua;");
             Client.RunCommand(host + "echo \"Description=\\\"\\\",\" >> config.lua;");
@@ -41,27 +47,10 @@ namespace Crytex.GameServers.Games
             Client.RunCommand(host + "echo \"Module ={MaxErrorCount = 5,ErrorDecrementTime = 500,SendAutorunWhenEmpty = false}\" >> config.lua;");
             Client.RunCommand(host + "echo \"World ={Time = 0.0,TimeStep = 1,WeatherSeverity = 0}\" >> config.lua;");
 
-            resModel.Data = !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
-            return resModel;
+
+            var result = new GameResult();
+            return result;
         }
 
-        public override DataReceivedModel On(GameHostParam param)
-        {
-            var resModel = base.On(param);
-            var run = $"cd /host/jc2{UserId};" + //screen -dmS server_start_jc2{userId} " +
-                      $"./{GameName} start -servicename jc2{UserId} -port {param.GamePort} -clientport {param.GamePort + 1};";
-            var res = Client.RunCommand(run);
-            resModel.Data = !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
-            return resModel;
-        }
-
-        public override void Off(GameHostParam param)
-        {
-            base.Off(param);
-            var run = $"cd /host/{GameName};screen -dmS server_start_jc2{UserId} " +
-                      $"./{GameName} stop -servicename jc2{UserId} -port {param.GamePort};";
-            var res = Client.RunCommand(run);
-            if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
-        }
     }
 }

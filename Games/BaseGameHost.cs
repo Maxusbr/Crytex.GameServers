@@ -201,7 +201,7 @@ namespace Crytex.GameServers.Games
             Terminal.DataReceived += lambda;
             Writer?.WriteLine(command);
 
-            var result = tsc.Task != Task.WhenAny(Task.Delay(TimeSpan.FromMinutes(2)), tsc.Task).Result ? "ErrorWait" : CollectResiveString;
+            var result = tsc.Task != Task.WhenAny(Task.Delay(TimeSpan.FromMinutes(1)), tsc.Task).Result ? "ErrorWait" : CollectResiveString;
             Terminal.DataReceived -= lambda;
             return result;
         }
