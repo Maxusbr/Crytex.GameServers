@@ -26,7 +26,7 @@ namespace Crytex.GameServers.Games
         protected readonly string Password;
         protected string GameName;
         protected string Path;
-        protected int GameServerId;
+        protected string GameServerId;
         protected bool IsWaitAll;
         protected string CollectResiveString;
         protected Regex FoundConsoleEnd;
