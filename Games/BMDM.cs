@@ -19,7 +19,7 @@ namespace Crytex.GameServers.Games
         {
             var result = new GameResult();
             var run = $"cd {Path}/{GameName};" +
-                      $"./{GameName} start -servicename {GameName}{UserId} -port {param.GamePort} " +
+                      $"./{GameName} start -servicename {GameName}{GameServerId} -port {param.GamePort} " +
                       $"-clientport {param.GamePort + 1} -sourcetvport {param.GamePort + 2};";
             var res = Client.RunCommand(run);
             if (!string.IsNullOrEmpty(res.Error))

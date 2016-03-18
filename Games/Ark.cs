@@ -16,9 +16,9 @@ namespace Crytex.GameServers.Games
 
         public override GameResult Create(CreateParam param)
         {
-            UserId = param.UserId;
+            GameServerId = param.GameServerId;
             var host = $"cd {Path}/{GameName}/serverfiles/{GameCode}/Saved/Config/LinuxServer;";
-            Client.RunCommand(host + $"chmod 777 {GameName}{UserId}.ini;");
+            Client.RunCommand(host + $"chmod 777 {GameName}{GameServerId}.ini;");
             Client.RunCommand(host + "echo  \"[ServerSettings]\nAllowFlyerCarryPvE=False\nAllowThirdPersonPlayer=False\n" +
                               "AlwaysNotifyPlayerLeft=False\nAutoSavePeriodMinutes=15.000000\nClampResourceHarvestDamage=False\n" +
                               "DifficultyOffset=0.200000\nDisableStructureDecayPvE=False\nDontAlwaysNotifyPlayerJoined=False\n" +
@@ -43,10 +43,10 @@ namespace Crytex.GameServers.Games
                               "FullscreenMode=2\nLastConfirmedFullscreenMode=2\nVersion=5\n\n[ScalabilityGroups]\nsg.ResolutionQuality=100\n" +
                               "sg.ViewDistanceQuality=3\nsg.AntiAliasingQuality=3\nsg.ShadowQuality=3\nsg.PostProcessQuality=3\n" +
                               "sg.TextureQuality=3\nsg.EffectsQuality=3\nsg.TrueSkyQuality=3\nsg.GroundClutterQuality=3\nsg.IBLQuality=1\n" +
-                              $"sg.HeightFieldShadowQuality=3\n\" > {GameName}{UserId}.ini;");
+                              $"sg.HeightFieldShadowQuality=3\n\" > {GameName}{GameServerId}.ini;");
             Client.RunCommand(host + $"echo \"[SessionSettings]\nSessionName=arkserver\nQueryPort={param.GamePort+1}\nPort={param.GamePort}\n" +
                               $"[/Script/Engine.GameSession]\nMaxPlayers=127\n[MessageOfTheDay]\nMessage=Welcome to ARK Server\n" +
-                              $"Duration=5\n\" >> {GameName}{UserId}.ini;");
+                              $"Duration=5\n\" >> {GameName}{GameServerId}.ini;");
 
             var result = new GameResult();
             return result;
