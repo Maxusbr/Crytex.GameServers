@@ -30,7 +30,7 @@ namespace Critex.GameConcole
         {
             Console.Write(" 1 - Ark \t 2 - Arma3\n 3 - CS\t 4 - CSGO\n 5 - CSS\t 6 - Dod\n 7 - Gmod\t 8 - L4D\n 9 - L4D2\t 10 - Minecraft\n" +
                           " 11 - TF2\t 12 - Bmdm\n 13 - Cscz\t 14 - Cure\n 15 - Insurgency\t 16 - JustCause2\n 17 - Rust\t 18 - Dods\n" +
-                          " Выберите игру: ");
+                          " 19 - Dst\t 20 - Bmdm\n Выберите игру: ");
             var key = Console.ReadLine();
             _connectparam = GetLinuxConnect(key);
             if (_connectparam == null) return;
@@ -256,59 +256,6 @@ namespace Critex.GameConcole
                 SshPassword = "QwerT@12",
                 Path = "/home/vncuser/host"
             };
-            switch (game)
-            {
-                case GameFamily.Cs:
-                    res.GameName = "cs";
-                    break;
-                case GameFamily.Ark:
-                    res.GameName = "ark";
-                    break;
-                case GameFamily.Arma3:
-                    res.GameName = "arma3";
-                    break;
-                case GameFamily.Css:
-                    res.GameName = "css";
-                    break;
-                case GameFamily.CsGo:
-                    res.GameName = "csgo";
-                    break;
-                case GameFamily.Cure:
-                    res.GameName = "cure";
-                    break;
-                case GameFamily.Dod:
-                    break;
-                case GameFamily.GMod:
-                    res.GameName = "gmod";
-                    break;
-                case GameFamily.L4D:
-                    res.GameName = "l4d";
-                    break;
-                case GameFamily.L4D2:
-                    res.GameName = "l4d2";
-                    break;
-                case GameFamily.Minecraft:
-                    break;
-                case GameFamily.SaMp:
-                    break;
-                case GameFamily.T2F:
-                    res.GameName = "tf2";
-                    break;
-                case GameFamily.Bmdm:
-                    res.GameName = "bmdm";
-                    break;
-                case GameFamily.Cscz:
-                    res.GameName = "cscz";
-                    break;
-                case GameFamily.Insurgency:
-                    res.GameName = "ins";
-                    break;
-                case GameFamily.JustCause2:
-                    res.GameName = "jc2";
-                    break;
-                case GameFamily.Rust:
-                    break;
-            }
             return res;
         }
         private static ConnectParam WindowsConnecton(GameFamily game)
@@ -382,6 +329,9 @@ namespace Critex.GameConcole
                 //    break;
                 case "18":
                     connectparam = LinuxConnecton(GameFamily.Dods);
+                    break;
+                case "19":
+                    connectparam = LinuxConnecton(GameFamily.DontStarveTogether);
                     break;
             }
             return connectparam;

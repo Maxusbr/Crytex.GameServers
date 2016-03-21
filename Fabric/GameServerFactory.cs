@@ -62,6 +62,8 @@ namespace Crytex.GameServers.Fabric
                 //    return new Rust(param);
                 case GameFamily.Dod:
                     return new Dod(param);
+                case GameFamily.DontStarveTogether:
+                    return new Dst(param);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(param.FamilyGame), param.FamilyGame, null);
             }
