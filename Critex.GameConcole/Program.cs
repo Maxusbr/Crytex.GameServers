@@ -30,7 +30,7 @@ namespace Critex.GameConcole
         {
             Console.Write(" 1 - Ark \t 2 - Arma3\n 3 - CS\t 4 - CSGO\n 5 - CSS\t 6 - Dod\n 7 - Gmod\t 8 - L4D\n 9 - L4D2\t 10 - Minecraft\n" +
                           " 11 - TF2\t 12 - Bmdm\n 13 - Cscz\t 14 - Cure\n 15 - Insurgency\t 16 - JustCause2\n 17 - Rust\t 18 - Dods\n" +
-                          " 19 - Dst\t 20 - Bmdm\n Выберите игру: ");
+                          " 19 - Dst\t 20 - DoubleAction\n 21 - FistfulofFrags\t 22 - Hurtworld\n Выберите игру: ");
             var key = Console.ReadLine();
             _connectparam = GetLinuxConnect(key);
             if (_connectparam == null) return;
@@ -332,6 +332,15 @@ namespace Critex.GameConcole
                     break;
                 case "19":
                     connectparam = LinuxConnecton(GameFamily.DontStarveTogether);
+                    break;
+                case "20":
+                    connectparam = LinuxConnecton(GameFamily.DoubleAction);
+                    break;
+                case "21":
+                    connectparam = LinuxConnecton(GameFamily.FistfulofFrags);
+                    break;
+                case "22":
+                    connectparam = LinuxConnecton(GameFamily.Hurtworld);
                     break;
             }
             return connectparam;

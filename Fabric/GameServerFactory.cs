@@ -64,6 +64,12 @@ namespace Crytex.GameServers.Fabric
                     return new Dod(param);
                 case GameFamily.DontStarveTogether:
                     return new Dst(param);
+                case GameFamily.DoubleAction:
+                    return new Dab(param);
+                case GameFamily.FistfulofFrags:
+                    return new Fof(param);
+                case GameFamily.Hurtworld:
+                    return new Hw(param);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(param.FamilyGame), param.FamilyGame, null);
             }
