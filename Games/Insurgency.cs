@@ -13,7 +13,7 @@ namespace Crytex.GameServers.Games
 {
     public class Insurgency : Cs
     {
-        public Insurgency(ConnectParam param) : base(param, "insurgency") { }
+        public Insurgency(ConnectParam param) : base(param, "insurgency") { GameName = "ins"; }
 
         protected override GameResult On(ChangeStatusParam param)
         {

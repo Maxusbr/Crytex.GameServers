@@ -13,7 +13,7 @@ namespace Crytex.GameServers.Games
 {
     public class Bmdm : Cs
     {
-        public Bmdm(ConnectParam param) : base(param, "bms") {}
+        public Bmdm(ConnectParam param) : base(param, "bms") { GameName = "bmdm"; }
 
         protected override GameResult On(ChangeStatusParam param)
         {

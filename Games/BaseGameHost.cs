@@ -35,7 +35,7 @@ namespace Crytex.GameServers.Games
         {
             Path = param.Path;
             GameCode = gameCode;
-            GameName = param.GameName;
+            if (!string.IsNullOrEmpty(param.GameName)) GameName = param.GameName;
             Password = param.SshPassword;
             Ip = param.SshIp;
             Client = new SshClient(param.SshIp, param.SshPort, param.SshUserName, param.SshPassword);
@@ -147,8 +147,8 @@ namespace Crytex.GameServers.Games
         {
             OpenConsole(userGameParam);
             CollectResiveString = string.Empty;
-            
-            var result = new AdvancedStateGameResult {Succes = false};
+
+            var result = new AdvancedStateGameResult { Succes = false };
             return result;
         }
 
@@ -168,13 +168,13 @@ namespace Crytex.GameServers.Games
             Terminal.DataReceived += lambda;
 
             Writer = new StreamWriter(Terminal) { AutoFlush = true };
-            if(string.IsNullOrEmpty(openCommand))
+            if (string.IsNullOrEmpty(openCommand))
                 openCommand = $"cd {Path}/{GameName};./{GameName} console -servicename {GameName}{GameServerId} -port {param.GamePort};";
             Writer.WriteLine(openCommand);
-            var result = tsc.Task == Task.WhenAny(Task.Delay(TimeSpan.FromMinutes(2)), tsc.Task).Result;
+            var result = tsc.Task == Task.WhenAny(Task.Delay(TimeSpan.FromSeconds(10)), tsc.Task).Result;
 
             Terminal.DataReceived -= lambda;
-           return result;
+            return result;
         }
 
         public virtual string CloseConsole(UserGameParam param, string closeCommand = "")
@@ -201,7 +201,7 @@ namespace Crytex.GameServers.Games
             Terminal.DataReceived += lambda;
             Writer?.WriteLine(command);
 
-            var result = tsc.Task != Task.WhenAny(Task.Delay(TimeSpan.FromMinutes(1)), tsc.Task).Result ? "ErrorWait" : CollectResiveString;
+            var result = tsc.Task != Task.WhenAny(Task.Delay(TimeSpan.FromSeconds(10)), tsc.Task).Result ? "ErrorWait" : CollectResiveString;
             Terminal.DataReceived -= lambda;
             return result;
         }

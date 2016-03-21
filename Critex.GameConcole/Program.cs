@@ -28,8 +28,9 @@ namespace Critex.GameConcole
 
         private static void RunServer()
         {
-            Console.Write(" 1 - Ark \n 2 - Arma3\n 3 - CS\n 4 - CSGO\n 5 - CSS\n 6 - Dods\n 7 - Gmod\n 8 - L4D\n 9 - L4D2\n 10 - Minecraft\n" +
-                          " 11 - TF2\n 12 - Bmdm\n 13 - Cscz\n 14 - Cure\n 15 - Insurgency\n 16 - JustCause2\n Выберите игру: ");
+            Console.Write(" 1 - Ark \t 2 - Arma3\n 3 - CS\t 4 - CSGO\n 5 - CSS\t 6 - Dod\n 7 - Gmod\t 8 - L4D\n 9 - L4D2\t 10 - Minecraft\n" +
+                          " 11 - TF2\t 12 - Bmdm\n 13 - Cscz\t 14 - Cure\n 15 - Insurgency\t 16 - JustCause2\n 17 - Rust\t 18 - Dods\n" +
+                          " Выберите игру: ");
             var key = Console.ReadLine();
             _connectparam = GetLinuxConnect(key);
             if (_connectparam == null) return;
@@ -266,7 +267,6 @@ namespace Critex.GameConcole
                 case GameFamily.Arma3:
                     res.GameName = "arma3";
                     break;
-
                 case GameFamily.Css:
                     res.GameName = "css";
                     break;
@@ -276,8 +276,7 @@ namespace Critex.GameConcole
                 case GameFamily.Cure:
                     res.GameName = "cure";
                     break;
-                case GameFamily.Dods:
-                    res.GameName = "dods";
+                case GameFamily.Dod:
                     break;
                 case GameFamily.GMod:
                     res.GameName = "gmod";
@@ -306,6 +305,8 @@ namespace Critex.GameConcole
                     break;
                 case GameFamily.JustCause2:
                     res.GameName = "jc2";
+                    break;
+                case GameFamily.Rust:
                     break;
             }
             return res;
@@ -344,7 +345,7 @@ namespace Critex.GameConcole
                     connectparam = LinuxConnecton(GameFamily.Css);
                     break;
                 case "6":
-                    connectparam = LinuxConnecton(GameFamily.Dods);
+                    connectparam = LinuxConnecton(GameFamily.Dod);
                     break;
                 case "7":
                     connectparam = LinuxConnecton(GameFamily.GMod);
@@ -375,6 +376,12 @@ namespace Critex.GameConcole
                     break;
                 case "16":
                     connectparam = LinuxConnecton(GameFamily.JustCause2);
+                    break;
+                //case "17":
+                //    connectparam = LinuxConnecton(GameFamily.Rust);
+                //    break;
+                case "18":
+                    connectparam = LinuxConnecton(GameFamily.Dods);
                     break;
             }
             return connectparam;

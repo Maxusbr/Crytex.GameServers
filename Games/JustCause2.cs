@@ -12,7 +12,7 @@ namespace Crytex.GameServers.Games
 {
     public class JustCause2 : BaseGameHost
     {
-        public JustCause2(ConnectParam param) : base(param, "jc2") { }
+        public JustCause2(ConnectParam param) : base(param, "jc2") { GameName = "jc2"; }
 
         public override GameResult Create(CreateParam param)
         {

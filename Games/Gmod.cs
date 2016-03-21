@@ -12,7 +12,7 @@ namespace Crytex.GameServers.Games
 {
     public class Gmod : Cs
     {
-        public Gmod(ConnectParam param) : base(param, "garrysmod") { }
+        public Gmod(ConnectParam param) : base(param, "garrysmod") { GameName = "gmod"; }
 
         protected override GameResult On(ChangeStatusParam param)
         {

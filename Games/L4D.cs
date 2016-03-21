@@ -12,7 +12,7 @@ namespace Crytex.GameServers.Games
 {
     public class L4D : BaseGameHost
     {
-        public L4D(ConnectParam param) : base(param, "left4dead") { }
+        public L4D(ConnectParam param) : base(param, "left4dead") { GameName = "l4d"; }
 
     }
 }

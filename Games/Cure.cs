@@ -12,7 +12,7 @@ namespace Crytex.GameServers.Games
 {
     public class Cure : BaseGameHost
     {
-        public Cure(ConnectParam param) : base(param, "cure") { }
+        public Cure(ConnectParam param) : base(param, "cure") { GameName = "cure"; }
 
         protected override GameResult On(ChangeStatusParam param)
         {

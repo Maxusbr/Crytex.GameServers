@@ -17,7 +17,7 @@ namespace Crytex.GameServers.Games
     public class Cs : BaseGameHost
     {
 
-        public Cs(ConnectParam param, string gameCode =  "cstrike") : base(param, gameCode) {  }
+        public Cs(ConnectParam param, string gameCode =  "cstrike") : base(param, gameCode) { GameName = "cs"; }
 
         public override bool OpenConsole(UserGameParam param, string openCommand = "")
         {

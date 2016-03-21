@@ -12,7 +12,7 @@ namespace Crytex.GameServers.Games
 {
     public class CsGo : Cs
     {
-        public CsGo(ConnectParam param) : base(param) { }
+        public CsGo(ConnectParam param) : base(param) { GameName = "csgo"; }
 
     }
 }
