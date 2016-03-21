@@ -10,9 +10,9 @@ using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
-    public class TF2 : BaseGameHost
+    public class Fof : Cs
     {
-        public TF2(ConnectParam param) : base(param, "tf") { }
+        public Fof(ConnectParam param) : base(param, "fof") { GameName = "fof"; }
 
         protected override GameResult On(ChangeStatusParam param)
         {

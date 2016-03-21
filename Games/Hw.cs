@@ -10,16 +10,21 @@ using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
-    public class TF2 : BaseGameHost
+    public class Hw : BaseGameHost
     {
-        public TF2(ConnectParam param) : base(param, "tf") { }
+        public Hw(ConnectParam param) : base(param, "hw") { GameName = "hw"; }
+
+        public override GameResult Create(CreateParam param)
+        {
+            var result = new GameResult();
+            return result;
+        }
 
         protected override GameResult On(ChangeStatusParam param)
         {
             var result = new GameResult();
             var run = $"cd {Path}/{GameName};" +
-                      $"./{GameName} start -servicename {GameName}{GameServerId} -port {param.GamePort} " +
-                      $"-clientport {param.GamePort + 1} -sourcetvport {param.GamePort + 2};";
+                      $"./{GameName} start -servicename {GameName}{GameServerId} -port {param.GamePort} -queryport {param.GamePort + 1};";
             var res = Client.RunCommand(run);
             if (!string.IsNullOrEmpty(res.Error))
             {

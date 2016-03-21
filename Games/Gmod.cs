@@ -10,36 +10,23 @@ using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
-    public class Gmod : BaseGameHost
+    public class Gmod : Cs
     {
-        public Gmod(ConnectParam param) : base(param) { }
+        public Gmod(ConnectParam param) : base(param, "garrysmod") { GameName = "gmod"; }
 
-        public override DataReceivedModel Go(GameHostParam param)
+        protected override GameResult On(ChangeStatusParam param)
         {
-            var resModel = base.Go(param);
-            var run = $"cd /host/{GameName}/serverfiles/garrysmod/cfg;cp -r gmod-server.cfg gmod{UserId}.cfg";
+            var result = new GameResult();
+            var run = $"cd {Path}/{GameName};" +
+                      $"./{GameName} start -servicename {GameName}{GameServerId} -port {param.GamePort} " +
+                      $"-clientport {param.GamePort + 1} -sourcetvport {param.GamePort + 2};";
             var res = Client.RunCommand(run);
-            resModel.Data = !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
-            return resModel;
-        }
-
-        public override DataReceivedModel On(GameHostParam param)
-        {
-            var resModel = base.On(param);
-            var run = $"cd /host/{GameName};screen -dmS server_start_gmod{UserId} " +
-                      $"./{GameName} start -servicename gmod{UserId} -port {param.GamePort} -clientport {param.GamePort + 1};";
-            var res = Client.RunCommand(run);
-            resModel.Data = !string.IsNullOrEmpty(res.Error) ? res.Error : res.Result;
-            return resModel;
-        }
-
-        public override void Off(GameHostParam param)
-        {
-            base.Off(param);
-            var run = $"cd /host/{GameName};screen -dmS server_start_gmod{UserId} " +
-                      $"./{GameName} stop -servicename gmod{UserId} -port {param.GamePort};";
-            var res = Client.RunCommand(run);
-            if (!string.IsNullOrEmpty(res.Error)) Console.WriteLine(res.Error);
+            if (!string.IsNullOrEmpty(res.Error))
+            {
+                ValidateError(res, result);
+            }
+            result.Data = res.Result;
+            return result;
         }
     }
 }

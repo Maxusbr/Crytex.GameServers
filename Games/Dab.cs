@@ -10,9 +10,22 @@ using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
-    public class TF2 : BaseGameHost
+    public class Dab : Cs
     {
-        public TF2(ConnectParam param) : base(param, "tf") { }
+        public Dab(ConnectParam param) : base(param, "dab") { GameName = "dab"; }
+
+        public override GameResult Create(CreateParam param)
+        {
+            GameServerId = param.GameServerId;
+            var run = $"cd {Path}/{GameName}/serverfiles/{GameCode}/cfg;cp -r da-server.cfg {GameName}{GameServerId}.cfg";
+            var res = Client.RunCommand(run);
+            var result = new GameResult();
+            if (!string.IsNullOrEmpty(res.Error))
+            {
+                ValidateError(res, result);
+            }
+            return result;
+        }
 
         protected override GameResult On(ChangeStatusParam param)
         {

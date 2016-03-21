@@ -12,6 +12,6 @@ namespace Crytex.GameServers.Games
 {
     public class Css : Cs
     {
-        public Css(ConnectParam param) : base(param) { }
+        public Css(ConnectParam param) : base(param) { GameName = "css"; }
     }
 }

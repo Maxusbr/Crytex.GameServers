@@ -17,7 +17,7 @@ namespace Crytex.GameServers.Games
     public class Cs : BaseGameHost
     {
 
-        public Cs(ConnectParam param, string gameCode =  "cstrike") : base(param, gameCode) {  }
+        public Cs(ConnectParam param, string gameCode =  "cstrike") : base(param, gameCode) { GameName = "cs"; }
 
         public override bool OpenConsole(UserGameParam param, string openCommand = "")
         {
@@ -25,9 +25,14 @@ namespace Crytex.GameServers.Games
             return base.OpenConsole(param);
         }
 
-        public override string SendConsoleCommand(string command, bool waitAll = false)
+        protected virtual void FoundEndConsoleCommand(string command)
         {
             FoundConsoleEnd = command.Equals("status") ? new Regex(@"[\w]+\s*users") : null;
+        }
+
+        public override string SendConsoleCommand(string command, bool waitAll = false)
+        {
+            FoundEndConsoleCommand(command);
             CollectResiveString = string.Empty;
             return base.SendConsoleCommand(command, waitAll);
         }

@@ -12,7 +12,7 @@ namespace Crytex.GameServers.Games
 {
     public class Ark : BaseGameHost
     {
-        public Ark(ConnectParam param) : base(param, "ShooterGame") {  }
+        public Ark(ConnectParam param) : base(param, "ShooterGame") { GameName = "ark"; }
 
         public override GameResult Create(CreateParam param)
         {
