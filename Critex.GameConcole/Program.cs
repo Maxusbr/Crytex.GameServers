@@ -41,7 +41,7 @@ namespace Critex.GameConcole
             {
                 Slots = 2,
                 GamePort = 27020,
-                GameServerId = 1002,
+                GameServerId = "1002",
                 GamePassword = "",
             };
             res = _server.Create(_gameparam);

@@ -8,7 +8,7 @@ namespace Crytex.GameServers.Models
 {
     public class UserGameParam
     {
-        public int GameServerId { get; set; }
+        public string GameServerId { get; set; }
         public int GamePort { get; set; }
         public string GamePassword { get; set; }
     }
