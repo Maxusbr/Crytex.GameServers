@@ -70,6 +70,10 @@ namespace Crytex.GameServers.Fabric
                     return new Fof(param);
                 case GameFamily.Hurtworld:
                     return new Hw(param);
+                //case GameFamily.KillingFloor:
+                //    return new Kf(param);
+                case GameFamily.Ns2:
+                    return new Ns2(param);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(param.FamilyGame), param.FamilyGame, null);
             }

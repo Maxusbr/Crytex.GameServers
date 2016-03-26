@@ -72,6 +72,7 @@ namespace Crytex.GameServers.Games
 
         public GameResult ChangeStatus(ChangeStatusParam param)
         {
+            if (!string.IsNullOrEmpty(param.GameServerId)) GameServerId = param.GameServerId;
             GameResult result = null;
             switch (param.TypeStatus)
             {
