@@ -13,7 +13,8 @@ namespace Critex.GameConcole
 {
     class Program
     {
-        private const string LinuxSrvIp = "194.15.147.231";
+        private const string LinuxSrvIp = "192.168.1.193";
+        //private const string LinuxSrvIp = "194.15.147.231";
         //private const string LinuxSrvIp = "149.202.66.34";
         private const string Localhost = "192.168.1.131";
 
@@ -346,9 +347,9 @@ namespace Critex.GameConcole
                 //case "23":
                 //    connectparam = LinuxConnecton(GameFamily.KillingFloor);
                 //    break;
-                case "24":
-                    connectparam = LinuxConnecton(GameFamily.Ns2);
-                    break;
+                //case "24":
+                //    connectparam = LinuxConnecton(GameFamily.Ns2);
+                //    break;
             }
             return connectparam;
         }

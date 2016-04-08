@@ -16,14 +16,10 @@ namespace Crytex.GameServers.Games
 
         public override GameResult Create(CreateParam param)
         {
-            GameServerId = param.GameServerId;
-            var run = $"cd {Path}/jc2users/;find {GameServerId}";
-            var res = Client.RunCommand(run);
-            if (!string.IsNullOrEmpty(res.Error))
-            {
-                run = $"cd {Path}/;mkdir jc2users/{GameServerId};cp -r jc2 jc2users/{GameServerId}/{GameName}";
-                Client.RunCommand(run);
-            }
+            if (!string.IsNullOrEmpty(param.GameServerId)) GameServerId = param.GameServerId;
+            var result = new GameResult();
+            var run = $"cd {Path}/jc2users;mkdir {GameServerId};cp -r jc2 {GameServerId}/{GameName}";
+            Client.RunCommand(run);
             Path = $"{Path}/jc2users/{GameServerId}";
             var host = $"cd {Path}/{GameName}/serverfiles;";
             Client.RunCommand(host + "chmod 777 config.lua;");
@@ -47,10 +43,17 @@ namespace Crytex.GameServers.Games
             Client.RunCommand(host + "echo \"Module ={MaxErrorCount = 5,ErrorDecrementTime = 500,SendAutorunWhenEmpty = false}\" >> config.lua;");
             Client.RunCommand(host + "echo \"World ={Time = 0.0,TimeStep = 1,WeatherSeverity = 0}\" >> config.lua;");
 
-
-            var result = new GameResult();
+            
             return result;
         }
 
+        public override bool CompleteInstal()
+        {
+            var run = $"cd {Path}/jc2users;find {GameServerId}";
+            var res1 = Client.RunCommand(run);
+            run = $"cd {Path}/jc2users/{GameServerId}/{GameName}/serverfiles;find config.lua";
+            var res2 = Client.RunCommand(run);
+            return string.IsNullOrEmpty(res1.Error) && string.IsNullOrEmpty(res2.Error);
+        }
     }
 }

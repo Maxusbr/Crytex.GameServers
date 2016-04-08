@@ -16,7 +16,9 @@ namespace Crytex.GameServers.Games
 
         public override GameResult Create(CreateParam param)
         {
-            GameServerId = param.GameServerId;
+            if (!string.IsNullOrEmpty(param.GameServerId)) GameServerId = param.GameServerId;
+            var result = new GameResult();
+
             var run = $"cd {Path}/{GameName}/serverfiles/cfg;cp -r arma3-server.server.cfg {GameName}{GameServerId}.server.cfg";
             var res = Client.RunCommand(run);
             var host = $"cd {Path}/{GameName}/serverfiles/cfg;";
@@ -55,7 +57,7 @@ namespace Crytex.GameServers.Games
             Client.RunCommand(host + "echo \"headlessClients[]={\\\"127.0.0.1\\\"};\nlocalClient[]={\\\"127.0.0.1\\\"};\n" +
                               "battleyeLicense=1;\" >> " +
                               $"{GameName}{GameServerId}.server.cfg;");
-            var result = new GameResult();
+            
 
             run = $"cd {Path}/{GameName}/serverfiles/cfg;cp -r arma3-server.network.cfg {GameName}{GameServerId}.network.cfg";
             res = Client.RunCommand(run);
@@ -65,6 +67,15 @@ namespace Crytex.GameServers.Games
                 ValidateError(res, result);
             }
             return result;
+        }
+
+        public override bool CompleteInstal()
+        {
+            var run = $"cd {Path}/{GameName}/serverfiles/cfg;find {GameName}{GameServerId}.server.cfg";
+            var res1 = Client.RunCommand(run);
+            run = $"cd {Path}/{GameName}/serverfiles/cfg;find {GameName}{GameServerId}.network.cfg";
+            var res2 = Client.RunCommand(run);
+            return string.IsNullOrEmpty(res1.Error) && string.IsNullOrEmpty(res2.Error);
         }
     }
 }
