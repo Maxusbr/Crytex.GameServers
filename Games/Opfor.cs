@@ -10,9 +10,22 @@ using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
-    public class Cure : Cs
+    public class Opfor : Cs
     {
-        public Cure(ConnectParam param) : base(param, "cure") { GameName = "cure"; }
+        public Opfor(ConnectParam param) : base(param, "gearbox") { GameName = "opfor"; }
+
+        public override GameResult Create(CreateParam param)
+        {
+            if (!string.IsNullOrEmpty(param.GameServerId)) GameServerId = param.GameServerId;
+            var run = $"cd {Path}/{GameName}/serverfiles/{GameCode};cp -r {GameName}-server.cfg {GameName}{GameServerId}.cfg";
+            var res = Client.RunCommand(run);
+            var result = new GameResult();
+            if (!string.IsNullOrEmpty(res.Error))
+            {
+                ValidateError(res, result);
+            }
+            return result;
+        }
 
         protected override GameResult On(ChangeStatusParam param)
         {

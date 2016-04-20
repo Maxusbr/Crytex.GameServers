@@ -12,16 +12,16 @@ namespace Crytex.GameServers.Games
 {
     public class JustCause2 : BaseGameHost
     {
-        public JustCause2(ConnectParam param) : base(param, "jc2") { GameName = "jc2"; }
+        public JustCause2(ConnectParam param) : base(param, "jc2") { GameName = "jc2"; _path = param.Path; }
+        private readonly string _path;
 
         public override GameResult Create(CreateParam param)
         {
             if (!string.IsNullOrEmpty(param.GameServerId)) GameServerId = param.GameServerId;
             var result = new GameResult();
-            var run = $"cd {Path}/jc2users;mkdir {GameServerId};cp -r jc2 {GameServerId}/{GameName}";
+            var run = $"cd {_path}/jc2users;mkdir {GameServerId};cp -r jc2 {GameServerId}/{GameName}";
             Client.RunCommand(run);
-            Path = $"{Path}/jc2users/{GameServerId}";
-            var host = $"cd {Path}/{GameName}/serverfiles;";
+            var host = $"cd {_path}/jc2users/{GameServerId}/{GameName}/serverfiles;";
             Client.RunCommand(host + "chmod 777 config.lua;");
             Client.RunCommand(host + "echo \"Server={\" > config.lua;");
             Client.RunCommand(host + "echo \"MaxPlayers=5000,\" >> config.lua;");
@@ -43,17 +43,15 @@ namespace Crytex.GameServers.Games
             Client.RunCommand(host + "echo \"Module ={MaxErrorCount = 5,ErrorDecrementTime = 500,SendAutorunWhenEmpty = false}\" >> config.lua;");
             Client.RunCommand(host + "echo \"World ={Time = 0.0,TimeStep = 1,WeatherSeverity = 0}\" >> config.lua;");
 
-            
+            Path = $"{_path}/jc2users/{GameServerId}/";
             return result;
         }
 
         public override bool CompleteInstal()
         {
-            var run = $"cd {Path}/jc2users;find {GameServerId}";
-            var res1 = Client.RunCommand(run);
-            run = $"cd {Path}/jc2users/{GameServerId}/{GameName}/serverfiles;find config.lua";
-            var res2 = Client.RunCommand(run);
-            return string.IsNullOrEmpty(res1.Error) && string.IsNullOrEmpty(res2.Error);
+            var run = $"cd {Path}/{GameName}/serverfiles;find config.lua";
+            var res = Client.RunCommand(run);
+            return string.IsNullOrEmpty(res.Error);
         }
     }
 }

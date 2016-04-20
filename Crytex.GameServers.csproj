@@ -76,6 +76,10 @@
     <Compile Include="Games\BaseGameHost.cs" />
     <Compile Include="Games\BMDM.cs" />
     <Compile Include="Games\CS.cs" />
+    <Compile Include="Games\Ql.cs" />
+    <Compile Include="Games\Pvkii.cs" />
+    <Compile Include="Games\Opfor.cs" />
+    <Compile Include="Games\Nmrih.cs" />
     <Compile Include="Games\Ns2.cs" />
     <Compile Include="Games\Kf.cs" />
     <Compile Include="Games\Hw.cs" />
