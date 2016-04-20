@@ -10,31 +10,31 @@ using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
-    public class Dab : Cs
+    public class Rust : BaseGameHost
     {
-        public Dab(ConnectParam param) : base(param, "dab") { GameName = "dab"; }
+        public Rust(ConnectParam param) : base(param, "rust") { GameName = "rust"; }
 
         public override GameResult Create(CreateParam param)
         {
-            if (!string.IsNullOrEmpty(param.GameServerId)) GameServerId = param.GameServerId;
-            var run = $"cd {Path}/{GameName}/serverfiles/{GameCode}/cfg;cp -r da-server.cfg {GameName}{GameServerId}.cfg";
+            GameServerId = param.GameServerId;
+            var run = $"cd {Path}/rust/serverfiles/server/;find {GameName}{GameServerId}";
             var res = Client.RunCommand(run);
-            var result = new GameResult();
             if (!string.IsNullOrEmpty(res.Error))
             {
-                ValidateError(res, result);
+                run = $"cd {Path}/rust/serverfiles/server/;mkdir {GameName}{GameServerId};" +
+                      $"cd rust-server; cp -r * {Path}/rust/serverfiles/server/{GameName}{GameServerId}";
+                Client.RunCommand(run);
             }
+            var result = new GameResult();
             return result;
         }
 
         protected override GameResult On(ChangeStatusParam param)
         {
-            if (!string.IsNullOrEmpty(param.GameServerId)) GameServerId = param.GameServerId;
-            if (!CompleteInstal()) Create(new CreateParam());
             var result = new GameResult();
             var run = $"cd {Path}/{GameName};" +
                       $"./{GameName} start -servicename {GameName}{GameServerId} -port {param.GamePort} " +
-                      $"-clientport {param.GamePort + 1} -sourcetvport {param.GamePort + 2};";
+                      $"-rconport {param.GamePort + 1};";
             var res = Client.RunCommand(run);
             if (!string.IsNullOrEmpty(res.Error))
             {
@@ -43,6 +43,5 @@ namespace Crytex.GameServers.Games
             result.Data = res.Result;
             return result;
         }
-
     }
 }

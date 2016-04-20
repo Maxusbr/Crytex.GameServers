@@ -10,14 +10,14 @@ using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
-    public class Dab : Cs
+    public class Ql : Cs
     {
-        public Dab(ConnectParam param) : base(param, "dab") { GameName = "dab"; }
+        public Ql(ConnectParam param) : base(param, "baseq3") { GameName = "ql"; }
 
         public override GameResult Create(CreateParam param)
         {
             if (!string.IsNullOrEmpty(param.GameServerId)) GameServerId = param.GameServerId;
-            var run = $"cd {Path}/{GameName}/serverfiles/{GameCode}/cfg;cp -r da-server.cfg {GameName}{GameServerId}.cfg";
+            var run = $"cd {Path}/{GameName}/serverfiles/{GameCode};cp -r {GameName}-server.cfg {GameName}{GameServerId}.cfg";
             var res = Client.RunCommand(run);
             var result = new GameResult();
             if (!string.IsNullOrEmpty(res.Error))
@@ -29,12 +29,10 @@ namespace Crytex.GameServers.Games
 
         protected override GameResult On(ChangeStatusParam param)
         {
-            if (!string.IsNullOrEmpty(param.GameServerId)) GameServerId = param.GameServerId;
-            if (!CompleteInstal()) Create(new CreateParam());
             var result = new GameResult();
             var run = $"cd {Path}/{GameName};" +
-                      $"./{GameName} start -servicename {GameName}{GameServerId} -port {param.GamePort} " +
-                      $"-clientport {param.GamePort + 1} -sourcetvport {param.GamePort + 2};";
+                      $"./{GameName} start -servicename {GameName}{GameServerId} -gameport {param.GamePort} " +
+                      $"-rconport {param.GamePort + 1};";
             var res = Client.RunCommand(run);
             if (!string.IsNullOrEmpty(res.Error))
             {
@@ -43,6 +41,5 @@ namespace Crytex.GameServers.Games
             result.Data = res.Result;
             return result;
         }
-
     }
 }

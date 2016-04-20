@@ -16,6 +16,7 @@ namespace Crytex.GameServers.Games
 
         public override GameResult Create(CreateParam param)
         {
+            if (!string.IsNullOrEmpty(param.GameServerId)) GameServerId = param.GameServerId;
             var result = new GameResult();
             return result;
         }
@@ -32,6 +33,11 @@ namespace Crytex.GameServers.Games
             }
             result.Data = res.Result;
             return result;
+        }
+
+        public override bool CompleteInstal()
+        {
+            return true;
         }
     }
 }

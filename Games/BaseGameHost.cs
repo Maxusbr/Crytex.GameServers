@@ -30,6 +30,9 @@ namespace Crytex.GameServers.Games
         protected bool IsWaitAll;
         protected string CollectResiveString;
         protected Regex FoundConsoleEnd;
+        protected SshCommand Command;
+
+        public bool IsCompleteInstall => CompleteInstal();
 
         public BaseGameHost(ConnectParam param, string gameCode)
         {
@@ -45,6 +48,7 @@ namespace Crytex.GameServers.Games
         {
             Client.Connect();
             var result = new GameResult { Succes = Client.IsConnected };
+            if(Client.IsConnected) Command = Client.CreateCommand("");
             return result;
         }
 
@@ -58,22 +62,30 @@ namespace Crytex.GameServers.Games
 
         public virtual GameResult Create(CreateParam param)
         {
-            GameServerId = param.GameServerId;
-            var run = $"cd {Path}/{GameName}/serverfiles/{GameCode}/cfg;cp -r {GameName}-server.cfg {GameName}{GameServerId}.cfg";
-            var res = Client.RunCommand(run);
+            if (!string.IsNullOrEmpty(param.GameServerId)) GameServerId = param.GameServerId;
             var result = new GameResult();
-            if (!string.IsNullOrEmpty(res.Error))
+            var run = $"cd {Path}/{GameName}/serverfiles/{GameCode}/cfg;cp -r {GameName}-server.cfg {GameName}{GameServerId}.cfg";
+            Command.Execute(run);
+            
+            if (!string.IsNullOrEmpty(Command.Error))
             {
-                ValidateError(res, result);
+                ValidateError(Command, result);
             }
             return result;
         }
 
+        public virtual bool CompleteInstal()
+        {
+            var run = $"cd {Path}/{GameName}/serverfiles/{GameCode}/cfg;find {GameName}{GameServerId}.cfg";
+            Command.Execute(run);
+            return string.IsNullOrEmpty(Command.Error);
+        }
 
         public GameResult ChangeStatus(ChangeStatusParam param)
         {
             if (!string.IsNullOrEmpty(param.GameServerId)) GameServerId = param.GameServerId;
             GameResult result = null;
+            if (!CompleteInstal()) Create(new CreateParam {GamePort = param.GamePort});
             switch (param.TypeStatus)
             {
                 case GameHostTypeStatus.Enable:
@@ -91,12 +103,12 @@ namespace Crytex.GameServers.Games
             var result = new GameResult();
             var run = $"cd {Path}/{GameName};" +
                       $"./{GameName} start -servicename {GameName}{GameServerId} -port {param.GamePort} -clientport {param.GamePort + 1};";
-            var res = Client.RunCommand(run);
-            if (!string.IsNullOrEmpty(res.Error))
+            Command.Execute(run);
+            if (!string.IsNullOrEmpty(Command.Error))
             {
-                ValidateError(res, result);
+                ValidateError(Command, result);
             }
-            result.Data = res.Result;
+            result.Data = Command.Result;
             return result;
         }
 
@@ -109,13 +121,13 @@ namespace Crytex.GameServers.Games
             //Writer = new StreamWriter(Terminal) { AutoFlush = true };
             var run = $"cd {Path}/{GameName};" +
                       $"./{GameName} stop -servicename {GameName}{GameServerId} -port {param.GamePort};";
-            var res = Client.RunCommand(run);
-            if (!string.IsNullOrEmpty(res.Error))
+            Command.Execute(run);
+            if (!string.IsNullOrEmpty(Command.Error))
             {
-                ValidateError(res, result);
+                ValidateError(Command, result);
             }
             //Writer.WriteLine(run);
-            result.Data = res.Result;
+            result.Data = Command.Result;
             return result;
         }
 
@@ -124,8 +136,8 @@ namespace Crytex.GameServers.Games
             var result = new StateGameResult();
             var run = $"cd {Path}/{GameName};" +
                          $"./{GameName} monitor -servicename {GameName}{GameServerId} -port {userGameParam.GamePort};";
-            var res = Client.RunCommand(run);
-            var states = Regex.Matches(EscapeUtf8(res.Result),
+            Command.Execute(run);
+            var states = Regex.Matches(EscapeUtf8(Command.Result),
                 @"\r\[\s*(?<value>\w+)\s*\][^\r]*Monitor[^\:\r]+:\s*(?<name>[\w\s]+)[^\r]*\n")
                 .Cast<Match>()
                 .Select(m => new ServerStateModel
@@ -225,6 +237,7 @@ namespace Crytex.GameServers.Games
 
         private void Dispose()
         {
+            Command.Dispose();
             FoundConsoleEnd = null;
             Writer?.Close(); Writer?.Dispose(); Writer = StreamWriter.Null;
             Terminal?.Close(); Terminal?.Dispose();

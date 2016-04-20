@@ -72,8 +72,16 @@ namespace Crytex.GameServers.Fabric
                     return new Hw(param);
                 //case GameFamily.KillingFloor:
                 //    return new Kf(param);
-                case GameFamily.Ns2:
-                    return new Ns2(param);
+                //case GameFamily.Ns2:
+                //    return new Ns2(param);
+                case GameFamily.Nmrih:
+                    return new Nmrih(param);
+                case GameFamily.Opfor:
+                    return new Opfor(param);
+                case GameFamily.Pvkii:
+                    return new Pvkii(param);
+                case GameFamily.Ql:
+                    return new Ql(param);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(param.FamilyGame), param.FamilyGame, null);
             }

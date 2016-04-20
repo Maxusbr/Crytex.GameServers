@@ -10,6 +10,7 @@ namespace Crytex.GameServers.Interface
 {
     public interface IGameHost
     {
+        bool IsCompleteInstall { get; }
         GameResult Connect();
         GameResult Disconnect();
         GameResult Create(CreateParam param);//Go

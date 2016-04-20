@@ -16,7 +16,8 @@ namespace Crytex.GameServers.Games
 
         public override GameResult Create(CreateParam param)
         {
-            GameServerId = param.GameServerId;
+            if (!string.IsNullOrEmpty(param.GameServerId)) GameServerId = param.GameServerId;
+            var result = new GameResult();
             var host = $"cd {Path}/{GameName}/serverfiles/{GameCode}/Saved/Config/LinuxServer;";
             Client.RunCommand(host + $"chmod 777 {GameName}{GameServerId}.ini;");
             Client.RunCommand(host + "echo  \"[ServerSettings]\nAllowFlyerCarryPvE=False\nAllowThirdPersonPlayer=False\n" +
@@ -47,9 +48,14 @@ namespace Crytex.GameServers.Games
             Client.RunCommand(host + $"echo \"[SessionSettings]\nSessionName=arkserver\nQueryPort={param.GamePort+1}\nPort={param.GamePort}\n" +
                               $"[/Script/Engine.GameSession]\nMaxPlayers=127\n[MessageOfTheDay]\nMessage=Welcome to ARK Server\n" +
                               $"Duration=5\n\" >> {GameName}{GameServerId}.ini;");
-
-            var result = new GameResult();
             return result;
+        }
+
+        public override bool CompleteInstal()
+        {
+            var run = $"cd {Path}/{GameName}/serverfiles/{GameCode}/Saved/Config/LinuxServer;find {GameName}{GameServerId}.ini";
+            var res = Client.RunCommand(run);
+            return string.IsNullOrEmpty(res.Error);
         }
     }
 }

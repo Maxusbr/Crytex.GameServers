@@ -10,9 +10,9 @@ using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
-    public class Cure : Cs
+    public class Pvkii : Cs
     {
-        public Cure(ConnectParam param) : base(param, "cure") { GameName = "cure"; }
+        public Pvkii(ConnectParam param) : base(param, "pvkii") { GameName = "pvkii"; }
 
         protected override GameResult On(ChangeStatusParam param)
         {

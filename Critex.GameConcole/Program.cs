@@ -13,8 +13,9 @@ namespace Critex.GameConcole
 {
     class Program
     {
-        private const string LinuxSrvIp = "194.15.147.231";
-        //private const string LinuxSrvIp = "149.202.66.34";
+        //private const string LinuxSrvIp = "192.168.1.193";
+        //private const string LinuxSrvIp = "194.15.147.231";
+        private const string LinuxSrvIp = "51.254.55.136";
         private const string Localhost = "192.168.1.131";
 
         private static ConnectParam _connectparam;
@@ -31,7 +32,7 @@ namespace Critex.GameConcole
             Console.Write(" 1 - Ark \t 2 - Arma3\n 3 - CS\t 4 - CSGO\n 5 - CSS\t 6 - Dod\n 7 - Gmod\t 8 - L4D\n 9 - L4D2\t 10 - Minecraft\n" +
                           " 11 - TF2\t 12 - Bmdm\n 13 - Cscz\t 14 - Cure\n 15 - Insurgency\t 16 - JustCause2\n 17 - Rust\t 18 - Dods\n" +
                           " 19 - Dst\t 20 - DoubleAction\n 21 - FistfulofFrags\t 22 - Hurtworld\n 23 - KillingFloor\t 24 - NS2\n" +
-                          " Выберите игру: ");
+                          " 25 - Nmrih\t 26 - Opfor\n 27 - Pvkii\t 28 - Quake Live\n Выберите игру: ");
             var key = Console.ReadLine();
             _connectparam = GetLinuxConnect(key);
             if (_connectparam == null) return;
@@ -249,12 +250,12 @@ namespace Critex.GameConcole
                 FamilyGame = game,
                 SshIp = LinuxSrvIp,
                 SshPort = 22,
-                SshUserName = "max",
-                SshPassword = "Qwerty#1",
-                Path = "/host"
+                //SshUserName = "max",
+                //SshPassword = "Qwerty#1",
+                Path = "/host",
                 //SshPort = 20002,
-                //SshUserName = "vncuser",
-                //SshPassword = "QwerT@12",
+                SshUserName = "vnc",
+                SshPassword = "QwerT@12",
                 //Path = "/home/vncuser/host"
             };
             return res;
@@ -346,8 +347,20 @@ namespace Critex.GameConcole
                 //case "23":
                 //    connectparam = LinuxConnecton(GameFamily.KillingFloor);
                 //    break;
-                case "24":
-                    connectparam = LinuxConnecton(GameFamily.Ns2);
+                //case "24":
+                //    connectparam = LinuxConnecton(GameFamily.Ns2);
+                //    break;
+                case "25":
+                    connectparam = LinuxConnecton(GameFamily.Nmrih);
+                    break;
+                case "26":
+                    connectparam = LinuxConnecton(GameFamily.Opfor);
+                    break;
+                case "27":
+                    connectparam = LinuxConnecton(GameFamily.Pvkii);
+                    break;
+                case "28":
+                    connectparam = LinuxConnecton(GameFamily.Ql);
                     break;
             }
             return connectparam;

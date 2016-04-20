@@ -7,7 +7,7 @@ using Crytex.GameServers.Models;
 
 namespace Crytex.GameServers.Games
 {
-    public class L4D2 : BaseGameHost
+    public class L4D2 : L4D
     {
         public L4D2(ConnectParam param) : base(param, "left4dead2") { GameName = "l4d2"; }
     }
