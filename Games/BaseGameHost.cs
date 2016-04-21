@@ -133,6 +133,7 @@ namespace Crytex.GameServers.Games
 
         public virtual StateGameResult GetState(UserGameParam userGameParam)
         {
+            if (string.IsNullOrEmpty(GameServerId)) GameServerId = userGameParam.GameServerId;
             var result = new StateGameResult();
             var run = $"cd {Path}/{GameName};" +
                          $"./{GameName} monitor -servicename {GameName}{GameServerId} -port {userGameParam.GamePort};";

@@ -24,7 +24,32 @@ namespace Critex.GameConcole
 
         static void Main(string[] args)
         {
-            ReadLine();
+            //ReadLine();
+            var key = "3";
+            _connectparam = GetLinuxConnect(key);
+            if (_connectparam == null) return;
+            _server = GameServerFactory.Instance.Get(_connectparam);
+            var res = _server.Connect();
+            var gameServerId = "s4_test_cs";
+            var gameServerPort = 2332;
+            var gamePass = "pass123";
+
+
+
+            UserGameParam userGameParam = new UserGameParam
+            {
+                GameServerId = gameServerId,
+                GamePort = gameServerPort,
+                GamePassword = gamePass
+            };
+            var state = _server.GetState(userGameParam);
+            Console.WriteLine(state.Status);
+
+
+            var openRes = _server.OpenConsole(userGameParam);
+            var resp = _server.SendConsoleCommand("lalala");
+            Console.WriteLine(resp);
+            _server.CloseConsole(userGameParam);
         }
 
         private static void RunServer()
