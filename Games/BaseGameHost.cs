@@ -180,7 +180,7 @@ namespace Crytex.GameServers.Games
                     tsc.SetResult(true);
             };
             Terminal.DataReceived += lambda;
-
+            Terminal.DataReceived += Terminal_DataReceived;
             Writer = new StreamWriter(Terminal) { AutoFlush = true };
             if (string.IsNullOrEmpty(openCommand))
                 openCommand = $"cd {Path}/{GameName};./{GameName} console -servicename {GameName}{GameServerId} -port {param.GamePort};";
@@ -199,12 +199,18 @@ namespace Crytex.GameServers.Games
             return true;
         }
 
+        private void Terminal_DataReceived(object sender, ShellDataEventArgs e)
+        {
+            ConsoleDataReceived?.Invoke(sender, EscapeUtf8(Encoding.UTF8.GetString(e.Data)));
+        }
+
         public virtual string CloseConsole(UserGameParam param, string closeCommand = "")
         {
             var run = $"^b d";
             if (Terminal == null || Writer == StreamWriter.Null) return "";
             Writer?.WriteLine(run);
             FoundConsoleEnd = null;
+            Terminal.DataReceived += Terminal_DataReceived;
             Writer?.Close(); Writer?.Dispose(); Writer = StreamWriter.Null;
             Terminal?.Close(); Terminal?.Dispose();
             return CollectResiveString;
@@ -227,6 +233,8 @@ namespace Crytex.GameServers.Games
             Terminal.DataReceived -= lambda;
             return result;
         }
+
+        public event EventHandler<string> ConsoleDataReceived;
 
         protected void ValidateError(SshCommand res, GameResult result)
         {

@@ -22,5 +22,7 @@ namespace Crytex.GameServers.Interface
         bool OpenConsole(UserGameParam param, string openCommand = "");
         string CloseConsole(UserGameParam param, string closeCommand = "");
         string SendConsoleCommand(string command, bool waitAll = false);
+
+        event EventHandler<string> ConsoleDataReceived;
     }
 }
