@@ -188,7 +188,7 @@ namespace Crytex.GameServers.Games
             var result = tsc.Task == Task.WhenAny(Task.Delay(TimeSpan.FromSeconds(10)), tsc.Task).Result;
 
             Terminal.DataReceived -= lambda;
-            return result;
+            return true;
         }
 
         public virtual string CloseConsole(UserGameParam param, string closeCommand = "")
