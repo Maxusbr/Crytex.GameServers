@@ -184,8 +184,16 @@ namespace Crytex.GameServers.Games
             Writer = new StreamWriter(Terminal) { AutoFlush = true };
             if (string.IsNullOrEmpty(openCommand))
                 openCommand = $"cd {Path}/{GameName};./{GameName} console -servicename {GameName}{GameServerId} -port {param.GamePort};";
-            Writer.WriteLine(openCommand);
-            var result = tsc.Task == Task.WhenAny(Task.Delay(TimeSpan.FromSeconds(10)), tsc.Task).Result;
+            try
+            {
+                Writer.WriteLine(openCommand);
+                var result = tsc.Task == Task.WhenAny(Task.Delay(TimeSpan.FromSeconds(10)), tsc.Task).Result;
+            }
+            catch (Exception e)
+            {
+                Terminal.DataReceived -= lambda;
+                return false;
+            }
 
             Terminal.DataReceived -= lambda;
             return true;
