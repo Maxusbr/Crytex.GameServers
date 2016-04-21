@@ -33,7 +33,7 @@ namespace Critex.GameConcole
             var gameServerId = "s4_test_cs";
             var gameServerPort = 2332;
             var gamePass = "pass123";
-
+            _server.ConsoleDataReceived += _server_ConsoleDataReceived;
 
 
             UserGameParam userGameParam = new UserGameParam
@@ -42,14 +42,27 @@ namespace Critex.GameConcole
                 GamePort = gameServerPort,
                 GamePassword = gamePass
             };
-            var state = _server.GetState(userGameParam);
-            Console.WriteLine(state.Status);
+            //var state = _server.GetState(userGameParam);
+            //Console.WriteLine(state.Status);
 
 
             var openRes = _server.OpenConsole(userGameParam);
             var resp = _server.SendConsoleCommand("lalala");
             Console.WriteLine(resp);
+            while (true)
+            {
+                Console.Write($"console {_connectparam.FamilyGame} > ");
+                key = Console.ReadLine();
+                if(key != null && key.Equals("exit")) break;
+                resp = _server.SendConsoleCommand(key);
+            }
+                
             _server.CloseConsole(userGameParam);
+        }
+
+        private static void _server_ConsoleDataReceived(object sender, string e)
+        {
+            Console.WriteLine(e);
         }
 
         private static void RunServer()

@@ -168,6 +168,7 @@ namespace Crytex.GameServers.Games
 
         public virtual bool OpenConsole(UserGameParam param, string openCommand = "")
         {
+            if (string.IsNullOrEmpty(GameServerId)) GameServerId = param.GameServerId;
             IDictionary<TerminalModes, uint> termkvp = new Dictionary<TerminalModes, uint>();
             termkvp.Add(TerminalModes.ECHO, 53);
             Terminal = Client.CreateShellStream("xterm", 80, 24, 800, 600, 1024, termkvp);
