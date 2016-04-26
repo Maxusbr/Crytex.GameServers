@@ -24,7 +24,8 @@ namespace Crytex.GameServers.Games
             var host = $"cd {_path}/jc2users/{GameServerId}/{GameName}/serverfiles;";
             Client.RunCommand(host + "chmod 777 config.lua;");
             Client.RunCommand(host + "echo \"Server={\" > config.lua;");
-            Client.RunCommand(host + "echo \"MaxPlayers=5000,\" >> config.lua;");
+            MaxPlayers = MaxPlayers > 0 ? MaxPlayers : 5000;
+            Client.RunCommand(host + $"echo \"MaxPlayers={MaxPlayers},\" >> config.lua;");
             Client.RunCommand(host + "echo \"BindIP= \\\"\\\",\" >> config.lua;");
             Client.RunCommand(host + $"echo \"BindPort={param.GamePort},\" >> config.lua;");
             Client.RunCommand(host + "echo \"Timeout=10000,\" >> config.lua;");

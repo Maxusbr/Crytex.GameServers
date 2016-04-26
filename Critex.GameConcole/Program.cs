@@ -25,6 +25,39 @@ namespace Critex.GameConcole
         static void Main(string[] args)
         {
             //ReadLine();
+            //var key = "3";
+            //_connectparam = GetLinuxConnect(key);
+            //if (_connectparam == null) return;
+            //_server = GameServerFactory.Instance.Get(_connectparam);
+            //var res = _server.Connect();
+            //var gameServerId = "s4_test_cs";
+            //var gameServerPort = 2332;
+            //var gamePass = "pass123";
+            //_server.ConsoleDataReceived += _server_ConsoleDataReceived;
+
+
+            //UserGameParam userGameParam = new UserGameParam
+            //{
+            //    GameServerId = gameServerId,
+            //    GamePort = gameServerPort,
+            //    GamePassword = gamePass
+            //};
+            ////var state = _server.GetState(userGameParam);
+            ////Console.WriteLine(state.Status);
+
+
+            //var openRes = _server.OpenConsole(userGameParam);
+            //var resp = _server.SendConsoleCommand("lalala");
+            //Console.WriteLine(resp);
+            //while (true)
+            //{
+            //    Console.Write($"console {_connectparam.FamilyGame} > ");
+            //    key = Console.ReadLine();
+            //    if(key != null && key.Equals("exit")) break;
+            //    resp = _server.SendConsoleCommand(key);
+            //}
+
+            //_server.CloseConsole(userGameParam);
             var key = "3";
             _connectparam = GetLinuxConnect(key);
             if (_connectparam == null) return;
@@ -33,7 +66,7 @@ namespace Critex.GameConcole
             var gameServerId = "s4_test_cs";
             var gameServerPort = 2332;
             var gamePass = "pass123";
-            _server.ConsoleDataReceived += _server_ConsoleDataReceived;
+
 
 
             UserGameParam userGameParam = new UserGameParam
@@ -47,17 +80,15 @@ namespace Critex.GameConcole
 
 
             var openRes = _server.OpenConsole(userGameParam);
-            var resp = _server.SendConsoleCommand("lalala");
-            Console.WriteLine(resp);
-            while (true)
+            _server.ConsoleDataReceived += (sender, s) =>
             {
-                Console.Write($"console {_connectparam.FamilyGame} > ");
-                key = Console.ReadLine();
-                if(key != null && key.Equals("exit")) break;
-                resp = _server.SendConsoleCommand(key);
-            }
-                
+                Console.WriteLine(s);
+            };
+            var resp = _server.SendConsoleCommand("status");
+            //Console.WriteLine(resp);
             _server.CloseConsole(userGameParam);
+
+            Console.ReadKey();
         }
 
         private static void _server_ConsoleDataReceived(object sender, string e)

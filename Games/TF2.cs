@@ -12,24 +12,9 @@ using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
-    public class TF2 : BaseGameHost
+    public class TF2 : Cs
     {
         public TF2(ConnectParam param) : base(param, "tf") { GameName = "tf2"; }
-
-        protected override GameResult On(ChangeStatusParam param)
-        {
-            var result = new GameResult();
-            var run = $"cd {Path}/{GameName};" +
-                      $"./{GameName} start -servicename {GameName}{GameServerId} -port {param.GamePort} " +
-                      $"-clientport {param.GamePort + 1} -sourcetvport {param.GamePort + 2};";
-            var res = Client.RunCommand(run);
-            if (!string.IsNullOrEmpty(res.Error))
-            {
-                ValidateError(res, result);
-            }
-            result.Data = res.Result;
-            return result;
-        }
 
         public override bool OpenConsole(UserGameParam param, string openCommand = "")
         {
@@ -37,7 +22,7 @@ namespace Crytex.GameServers.Games
             return base.OpenConsole(param);
         }
 
-        protected void FoundEndConsoleCommand(string command)
+        protected override void FoundEndConsoleCommand(string command)
         {
             FoundConsoleEnd = command.Equals("status") ? new Regex(@"[\w]+\s*users") : null;
         }

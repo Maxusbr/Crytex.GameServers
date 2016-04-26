@@ -29,7 +29,8 @@ namespace Crytex.GameServers.Games
             Client.RunCommand(host + $"echo  \"[network]\ndefault_server_name = {GameName}{GameServerId}\n" +
                               $"default_server_description = Welcome to {GameName}{GameServerId} server\nserver_port = {param.GamePort}\n" +
                               $"server_password = {GameName}{GameServerId}\n\" > settings.ini;");
-            Client.RunCommand(host + $"echo  \"max_players = 16\npvp = false\ngame_mode = endless\nenable_autosaver = true\ntick_rate = 30\n" +
+            MaxPlayers = MaxPlayers > 0 ? MaxPlayers : 16;
+            Client.RunCommand(host + $"echo  \"max_players = {MaxPlayers}\npvp = false\ngame_mode = endless\nenable_autosaver = true\ntick_rate = 30\n" +
                               $"connection_timeout = 8000\nserver_save_slot = 1\nenable_vote_kick = true\npause_when_empty = true\n\n" +
                               $"[account]\ndedicated_lan_server = false\n[STEAM]\nDISABLECLOUD = true\n[MISC]\nCONSOLE_ENABLED = true\n" +
                               $"autocompiler_enabled = true\n\" >> settings.ini;");

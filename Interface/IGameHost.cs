@@ -24,5 +24,7 @@ namespace Crytex.GameServers.Interface
         string SendConsoleCommand(string command, bool waitAll = false);
 
         event EventHandler<string> ConsoleDataReceived;
+
+        GameResult DeleteServer(CreateParam param);
     }
 }

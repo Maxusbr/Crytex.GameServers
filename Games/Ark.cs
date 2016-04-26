@@ -25,7 +25,7 @@ namespace Crytex.GameServers.Games
                               "DifficultyOffset=0.200000\nDisableStructureDecayPvE=False\nDontAlwaysNotifyPlayerJoined=False\n" +
                               "EnablePvPGamma=False\nGlobalVoiceChat=False\nKickIdlePlayersPeriod=2400.000000\nNoTributeDownloads=False\n" +
                               "ProximityChat=False\nProximityVoiceChat=False\nPvEStructureDecayDestructionPeriod=0.000000\n" +
-                              "RCONEnabled=True\nRCONPort=32330\nServerAdminPassword=adminpassword\nServerCrosshair=False\n" +
+                              $"RCONEnabled=True\nRCONPort={param.GamePort+2}\nServerAdminPassword=adminpassword\nServerCrosshair=False\n" +
                               "ServerForceNoHUD=False\nServerHardcore=False\nServerPassword=\nServerPVE=False\nShowMapPlayerLocation=False\n" +
                               "TamedDinoDamageMultiplier=1.000000\nTamedDinoResistanceMultiplier=1.000000\n" +
                               "[/Script/ShooterGame.ShooterGameUserSettings]\nMasterAudioVolume=1.000000\nMusicAudioVolume=1.000000\n" +

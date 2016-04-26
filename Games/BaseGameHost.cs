@@ -17,6 +17,9 @@ namespace Crytex.GameServers.Games
 {
     public class BaseGameHost : IGameHost
     {
+        protected string ServerName;
+        protected int MaxPlayers;
+        protected string DefaultMap;
         protected readonly string GameCode;
         protected StreamWriter Writer;
         protected StreamReader Reader;
@@ -236,6 +239,10 @@ namespace Crytex.GameServers.Games
         }
 
         public event EventHandler<string> ConsoleDataReceived;
+        public GameResult DeleteServer(CreateParam param)
+        {
+            throw new NotImplementedException();
+        }
 
         protected void ValidateError(SshCommand res, GameResult result)
         {

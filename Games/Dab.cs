@@ -27,22 +27,5 @@ namespace Crytex.GameServers.Games
             return result;
         }
 
-        protected override GameResult On(ChangeStatusParam param)
-        {
-            if (!string.IsNullOrEmpty(param.GameServerId)) GameServerId = param.GameServerId;
-            if (!CompleteInstal()) Create(new CreateParam());
-            var result = new GameResult();
-            var run = $"cd {Path}/{GameName};" +
-                      $"./{GameName} start -servicename {GameName}{GameServerId} -port {param.GamePort} " +
-                      $"-clientport {param.GamePort + 1} -sourcetvport {param.GamePort + 2};";
-            var res = Client.RunCommand(run);
-            if (!string.IsNullOrEmpty(res.Error))
-            {
-                ValidateError(res, result);
-            }
-            result.Data = res.Result;
-            return result;
-        }
-
     }
 }

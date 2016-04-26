@@ -12,6 +12,7 @@ namespace Crytex.GameServers.Games
 {
     public class Hw : BaseGameHost
     {
+        
         public Hw(ConnectParam param) : base(param, "hw") { GameName = "hw"; }
 
         public override GameResult Create(CreateParam param)
@@ -25,13 +26,19 @@ namespace Crytex.GameServers.Games
         {
             var result = new GameResult();
             var run = $"cd {Path}/{GameName};" +
-                      $"./{GameName} start -servicename {GameName}{GameServerId} -port {param.GamePort} -queryport {param.GamePort + 1};";
-            var res = Client.RunCommand(run);
-            if (!string.IsNullOrEmpty(res.Error))
+                      $"./{GameName} start -servicename {GameName}{GameServerId} -port {param.GamePort} " +
+                      $"-queryport {param.GamePort + 1}";
+            if (!string.IsNullOrEmpty(ServerName))
+                run += $" -servername {ServerName}";
+            if (MaxPlayers > 0)
+                run += $" -maxplayers {MaxPlayers}";
+            run += ";";
+            Command.Execute(run);
+            if (!string.IsNullOrEmpty(Command.Error))
             {
-                ValidateError(res, result);
+                ValidateError(Command, result);
             }
-            result.Data = res.Result;
+            result.Data = Command.Result;
             return result;
         }
 

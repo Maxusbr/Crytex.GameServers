@@ -12,7 +12,7 @@ using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
 {
-    public class L4D : BaseGameHost
+    public class L4D : Cs
     {
         public L4D(ConnectParam param, string gameCode = "left4dead") : base(param, gameCode) { GameName = "l4d"; }
 
@@ -22,7 +22,7 @@ namespace Crytex.GameServers.Games
             return base.OpenConsole(param);
         }
 
-        protected void FoundEndConsoleCommand(string command)
+        protected override void FoundEndConsoleCommand(string command)
         {
             FoundConsoleEnd = command.Equals("status") ? new Regex(@"[\w]+\s*users") : null;
         }
