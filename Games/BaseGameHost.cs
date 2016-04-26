@@ -151,6 +151,7 @@ namespace Crytex.GameServers.Games
                 }).ToList();
             if (!states.All(o => o.ParameterValue.Equals("OK")))
             {
+                result.Succes = false;
                 foreach (var st in states)
                     result.ErrorMessage += $"{st.ParameterName}: {st.ParameterValue}\n";
                 result.Status = GameHostTypeStatus.Disable;
