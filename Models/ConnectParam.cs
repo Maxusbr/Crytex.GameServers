@@ -12,5 +12,6 @@ namespace Crytex.GameServers.Models
         public GameFamily FamilyGame { get; set; }
         public string GameName { get; set; }
         public string Path { get; set; }
+        public string GameServerId { get; set; }
     }
 }

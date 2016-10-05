@@ -36,9 +36,11 @@ namespace Crytex.GameServers.Games
         protected SshCommand Command;
 
         public bool IsCompleteInstall => CompleteInstal();
+        protected ConfigParams ConfigParam = new ConfigParams();
 
         public BaseGameHost(ConnectParam param, string gameCode)
         {
+            GameServerId = param.GameServerId;
             Path = param.Path;
             GameCode = gameCode;
             if (!string.IsNullOrEmpty(param.GameName)) GameName = param.GameName;
@@ -51,7 +53,7 @@ namespace Crytex.GameServers.Games
         {
             Client.Connect();
             var result = new GameResult { Succes = Client.IsConnected };
-            if(Client.IsConnected) Command = Client.CreateCommand("");
+            if (Client.IsConnected) Command = Client.CreateCommand("");
             return result;
         }
 
@@ -69,10 +71,16 @@ namespace Crytex.GameServers.Games
             var result = new GameResult();
             var run = $"cd {Path}/{GameName}/serverfiles/{GameCode}/cfg;cp -r {GameName}-server.cfg {GameName}{GameServerId}.cfg";
             Command.Execute(run);
-            
+
             if (!string.IsNullOrEmpty(Command.Error))
             {
                 ValidateError(Command, result);
+            }
+            if (!CompleteInstal())
+            {
+                result.Error = GameHostTypeError.CantCreate;
+                result.Succes = false;
+                result.ErrorMessage = "Error Create";
             }
             return result;
         }
@@ -88,7 +96,7 @@ namespace Crytex.GameServers.Games
         {
             if (!string.IsNullOrEmpty(param.GameServerId)) GameServerId = param.GameServerId;
             GameResult result = null;
-            if (!CompleteInstal()) Create(new CreateParam {GamePort = param.GamePort});
+            if (!CompleteInstal()) Create(new CreateParam { GamePort = param.GamePort });
             switch (param.TypeStatus)
             {
                 case GameHostTypeStatus.Enable:
@@ -97,7 +105,24 @@ namespace Crytex.GameServers.Games
                 case GameHostTypeStatus.Disable:
                     result = Off(param);
                     break;
+                    case GameHostTypeStatus.Restart:
+                    result = Restart(param);
+                    break;
             }
+            return result;
+        }
+
+        protected virtual GameResult Restart(ChangeStatusParam param)
+        {
+            var result = new GameResult();
+            var run = $"cd {Path}/{GameName};" +
+                      $"./{GameName} restart -servicename {GameName}{GameServerId} -port {param.GamePort} -clientport {param.GamePort + 1};";
+            Command.Execute(run);
+            if (!string.IsNullOrEmpty(Command.Error))
+            {
+                ValidateError(Command, result);
+            }
+            result.Data = Command.Result;
             return result;
         }
 
@@ -240,7 +265,7 @@ namespace Crytex.GameServers.Games
         }
 
         public event EventHandler<string> ConsoleDataReceived;
-        public GameResult DeleteServer(CreateParam param)
+        public virtual GameResult DeleteServer(CreateParam param)
         {
             throw new NotImplementedException();
         }
@@ -275,6 +300,28 @@ namespace Crytex.GameServers.Games
             var reg = new Regex(@"\u001b[\[\]\>\(]+(([\dA?;]+[JHcmrdhl])|[mcKBH]|[\d]*)");
             var res = reg.Replace(data, "");
             return res;
+        }
+
+        public ConfigParams GetConfigParams()
+        {
+            if (!ConfigParam.Any()) CreateDefaultConfigParams();
+            return ConfigParam;
+        }
+
+        public virtual GameResult SetConfigParams(ConfigParams configParams)
+        {
+            ConfigParam = configParams;
+            return new GameResult();
+        }
+
+        protected virtual void CreateDefaultConfigParams()
+        {
+        }
+
+        protected string GetParamVal(string name)
+        {
+            var res = ConfigParam.FirstOrDefault(o => o.Name.Equals(name));
+            return res?.Value.ToString() ?? "";
         }
     }
 }

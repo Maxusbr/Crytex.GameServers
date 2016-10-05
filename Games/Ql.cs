@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Crytex.GameServers.Interface;
 using Crytex.GameServers.Models;
+using Crytex.Model.Exceptions;
 using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
@@ -24,6 +25,12 @@ namespace Crytex.GameServers.Games
             {
                 ValidateError(res, result);
             }
+            if (!CompleteInstal())
+            {
+                result.Error = GameHostTypeError.CantCreate;
+                result.Succes = false;
+                result.ErrorMessage = "Error Create";
+            }
             return result;
         }
 
@@ -41,5 +48,20 @@ namespace Crytex.GameServers.Games
             result.Data = res.Result;
             return result;
         }
+        protected override GameResult Restart(ChangeStatusParam param)
+        {
+            var result = new GameResult();
+            var run = $"cd {Path}/{GameName};" +
+                      $"./{GameName} restart -servicename {GameName}{GameServerId} -gameport {param.GamePort} " +
+                      $"-rconport {param.GamePort + 1};";
+            var res = Client.RunCommand(run);
+            if (!string.IsNullOrEmpty(res.Error))
+            {
+                ValidateError(res, result);
+            }
+            result.Data = res.Result;
+            return result;
+        }
+
     }
 }

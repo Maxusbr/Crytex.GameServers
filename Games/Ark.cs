@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Crytex.GameServers.Interface;
 using Crytex.GameServers.Models;
+using Crytex.Model.Exceptions;
 using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
@@ -48,6 +49,12 @@ namespace Crytex.GameServers.Games
             Client.RunCommand(host + $"echo \"[SessionSettings]\nSessionName=arkserver\nQueryPort={param.GamePort+1}\nPort={param.GamePort}\n" +
                               $"[/Script/Engine.GameSession]\nMaxPlayers=127\n[MessageOfTheDay]\nMessage=Welcome to ARK Server\n" +
                               $"Duration=5\n\" >> {GameName}{GameServerId}.ini;");
+            if (!CompleteInstal())
+            {
+                result.Error = GameHostTypeError.CantCreate;
+                result.Succes = false;
+                result.ErrorMessage = "Error Create";
+            }
             return result;
         }
 

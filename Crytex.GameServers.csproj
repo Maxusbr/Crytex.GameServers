@@ -70,6 +70,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\ConfigParamType.cs" />
     <Compile Include="Fabric\GameServerFactory.cs" />
     <Compile Include="Games\Ark.cs" />
     <Compile Include="Games\Arma3.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="Interface\IGameHost.cs" />
     <Compile Include="Models\AdvancedStateGameResult.cs" />
     <Compile Include="Models\ChangeStatusParam.cs" />
+    <Compile Include="Models\ConfigParam.cs" />
     <Compile Include="Models\ConnectParam.cs" />
     <Compile Include="Models\CreateParam.cs" />
     <Compile Include="Models\DataReceivedModel.cs" />
@@ -115,7 +117,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Enums\" />
     <Folder Include="Example\" />
   </ItemGroup>
   <ItemGroup>

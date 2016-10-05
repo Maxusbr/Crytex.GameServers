@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Crytex.GameServers.Interface;
 using Crytex.GameServers.Models;
+using Crytex.Model.Exceptions;
 using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
@@ -45,6 +46,12 @@ namespace Crytex.GameServers.Games
             Client.RunCommand(host + "echo \"World ={Time = 0.0,TimeStep = 1,WeatherSeverity = 0}\" >> config.lua;");
 
             Path = $"{_path}/jc2users/{GameServerId}/";
+            if (!CompleteInstal())
+            {
+                result.Error = GameHostTypeError.CantCreate;
+                result.Succes = false;
+                result.ErrorMessage = "Error Create";
+            }
             return result;
         }
 

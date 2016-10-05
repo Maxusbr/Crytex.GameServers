@@ -24,7 +24,7 @@ namespace Critex.GameConcole
 
         static void Main(string[] args)
         {
-            //ReadLine();
+            ReadLine();
             //var key = "3";
             //_connectparam = GetLinuxConnect(key);
             //if (_connectparam == null) return;
@@ -58,37 +58,37 @@ namespace Critex.GameConcole
             //}
 
             //_server.CloseConsole(userGameParam);
-            var key = "3";
-            _connectparam = GetLinuxConnect(key);
-            if (_connectparam == null) return;
-            _server = GameServerFactory.Instance.Get(_connectparam);
-            var res = _server.Connect();
-            var gameServerId = "s4_test_cs";
-            var gameServerPort = 2332;
-            var gamePass = "pass123";
+            //var key = "3";
+            //_connectparam = GetLinuxConnect(key);
+            //if (_connectparam == null) return;
+            //_server = GameServerFactory.Instance.Get(_connectparam);
+            //var res = _server.Connect();
+            //var gameServerId = _connectparam.GameServerId;
+            //var gameServerPort = 2332;
+            //var gamePass = "pass123";
 
 
 
-            UserGameParam userGameParam = new UserGameParam
-            {
-                GameServerId = gameServerId,
-                GamePort = gameServerPort,
-                GamePassword = gamePass
-            };
-            //var state = _server.GetState(userGameParam);
-            //Console.WriteLine(state.Status);
+            //UserGameParam userGameParam = new UserGameParam
+            //{
+            //    GameServerId = gameServerId,
+            //    GamePort = gameServerPort,
+            //    GamePassword = gamePass
+            //};
+            ////var state = _server.GetState(userGameParam);
+            ////Console.WriteLine(state.Status);
 
 
-            var openRes = _server.OpenConsole(userGameParam);
-            _server.ConsoleDataReceived += (sender, s) =>
-            {
-                Console.WriteLine(s);
-            };
-            var resp = _server.SendConsoleCommand("status");
-            //Console.WriteLine(resp);
-            _server.CloseConsole(userGameParam);
+            //var openRes = _server.OpenConsole(userGameParam);
+            //_server.ConsoleDataReceived += (sender, s) =>
+            //{
+            //    Console.WriteLine(s);
+            //};
+            //var resp = _server.SendConsoleCommand("status");
+            ////Console.WriteLine(resp);
+            //_server.CloseConsole(userGameParam);
 
-            Console.ReadKey();
+            //Console.ReadKey();
         }
 
         private static void _server_ConsoleDataReceived(object sender, string e)
@@ -111,7 +111,7 @@ namespace Critex.GameConcole
             {
                 Slots = 2,
                 GamePort = 27020,
-                GameServerId = "1002",
+                GameServerId = _connectparam.GameServerId,
                 GamePassword = "",
             };
             res = _server.Create(_gameparam);
@@ -176,6 +176,9 @@ namespace Critex.GameConcole
                                 CloseConsole();
                                 _isConsoleOpen = false;
                                 break;
+                            case "7":
+                                SaveParams();
+                                break;
                             case "0":
                                 CloseConnect();
                                 _isWriteCommand = true;
@@ -194,6 +197,15 @@ namespace Critex.GameConcole
                     Console.WriteLine(e);
                 }
             }
+        }
+
+        private static void SaveParams()
+        {
+            var param = _server.GetConfigParams();
+            _server.SetConfigParams(param, _connectparam.GameServerId);
+            var statparam = GetChangeStatusParam();
+            statparam.TypeStatus = GameHostTypeStatus.Restart;
+            var res = _server.ChangeStatus(statparam);
         }
 
         private static void CloseConnect()
@@ -233,7 +245,8 @@ namespace Critex.GameConcole
         {
             Console.Write("\n");
             Console.Write(_connectparam == null ? " 1 - Старт сервер \n" : " 2 - Стоп сервер\n 3 - Состояние\n" +
-                                                  " 4 - Открыть консоль\n 5 - Статус сервера\n 6 - Закрыть консоль\n 0 - Закрыть соединение\n");
+                                                  " 4 - Открыть консоль\n 5 - Статус сервера\n 6 - Закрыть консоль\n" +
+                                                  " 7 - Сохранить параметры\n 0 - Закрыть соединение\n");
             Console.Write(" >> ");
         }
 
@@ -325,6 +338,7 @@ namespace Critex.GameConcole
                 //SshPort = 20002,
                 SshUserName = "vnc",
                 SshPassword = "QwerT@12",
+                GameServerId = "1002"
                 //Path = "/home/vncuser/host"
             };
             return res;

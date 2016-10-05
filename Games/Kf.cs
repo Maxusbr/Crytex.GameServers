@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Crytex.GameServers.Interface;
 using Crytex.GameServers.Models;
+using Crytex.Model.Exceptions;
 using Renci.SshNet;
 
 namespace Crytex.GameServers.Games
@@ -23,6 +24,12 @@ namespace Crytex.GameServers.Games
                   $"sed 's/OldQueryPortNumber=7717/OldQueryPortNumber={param.GamePort + 1}/g' temp.ini > {GameName}{GameServerId}.ini";
             res = Client.RunCommand(run);
             var result = new GameResult();
+            if (!CompleteInstal())
+            {
+                result.Error = GameHostTypeError.CantCreate;
+                result.Succes = false;
+                result.ErrorMessage = "Error Create";
+            }
             return result;
         }
 

@@ -34,5 +34,25 @@ namespace Crytex.GameServers.Games
             result.Data = Command.Result;
             return result;
         }
+        protected override GameResult Restart(ChangeStatusParam param)
+        {
+            var result = new GameResult();
+            var run = $"cd {Path}/{GameName};" +
+                      $"./{GameName} restart -servicename {GameName}{GameServerId} -port {param.GamePort} " +
+                      $"-clientport {param.GamePort + 1} -sourcetvport {param.GamePort + 2}";
+            if (!string.IsNullOrEmpty(DefaultMap))
+                run += $" -defaultmap {DefaultMap}";
+            if (MaxPlayers > 0)
+                run += $" -maxplayers {MaxPlayers}";
+            run += ";";
+            Command.Execute(run);
+            if (!string.IsNullOrEmpty(Command.Error))
+            {
+                ValidateError(Command, result);
+            }
+            result.Data = Command.Result;
+            return result;
+        }
+
     }
 }
